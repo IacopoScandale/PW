@@ -49,22 +49,22 @@ Relative path to commands.sh file containing command aliases
 """
 
 # alias names
-PW_ADD_COMM_NAME = "pw.add"
+PW_ADD_COMM_NAME = "pw_.add"
 """
 Alias name calling `pw_add.py`
 """
 
-PW_INFO_COMM_NAME = "pw.info"
+PW_INFO_COMM_NAME = "pw_.info"
 """
 Alias name calling `pw_site_info.py False`
 """
 
-PW_ALL_INFO_COMM_NAME = "pw.all_info"
+PW_ALL_INFO_COMM_NAME = "pw_.all_info"
 """
 Alias name calling `pw_site_info.py True`
 """
 
-PW_COPY_SITE_PW = "pw"
+PW_COPY_SITE_PW = "pw_"
 """
 Alias name calling `pw_copy.py`
 """

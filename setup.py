@@ -1,9 +1,9 @@
-import os, json
+import os, sys, json
 from Data.constants import PW_OBJECTS, CONFIG_JSON, CHECK_PW, COMMANDS_BAT, COMMANDS_SH, encrypt_str
 from Data.constants import PW_ADD_COMM_NAME, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME, PW_COPY_SITE_PW
 from getpass import getpass
 """
-PW Setup:
+PW Setup: Call this file as Administrator!
 
 Windows: double click on setup.py or call from terminal
 Linux: call this file from terminal
@@ -17,7 +17,7 @@ print("=================================",end="\n\n")
 
 # install location
 print("· Check if folder PW is in following path, otherwise insert it manually or call this file from terminal\n")
-ans_loc = input(f"Installing PW in current location: {os.getcwd()}?\n [y,n]: ")
+ans_loc = input(f"Installing PW in current location: {os.getcwd()}?\n [Y,n]: ")
 if ans_loc in "yYsS":
   pass
 elif ans_loc in "nN":
@@ -45,7 +45,7 @@ with open(CONFIG_JSON, "w") as jsonfile:
 
 
 # install cryptography (TODO try in an environment)
-print("Installing from file requirements.txt")
+print("\nInstalling from file requirements.txt")
 os.system("pip install -r requirements.txt")
 
 
@@ -78,6 +78,7 @@ def windows_alias_command_line(command_name:str, filename_py:str, args:str="") -
   return f"doskey {command_name} = python {command_file_path} {args} $*\n"
 
 # TODO create .bat and .sh aliases files
+# Windows Setup
 if os.name == "nt":
   # windows echo off
   commands = "@echo off\n\n"
@@ -99,11 +100,45 @@ if os.name == "nt":
   with open(COMMANDS_BAT, "w") as txtfile:
     txtfile.write(commands)
 
+  # add two "" for being sure that paths that contain spaces will be supported (in regedit it will write exactly "path" with one ")
+  commands_bat_full_path_str = '""' + os.path.join(os.getcwd(), COMMANDS_BAT) + '""'
+
+  # add automatically commands.bat file to regedit AutoRun Value in Command Processor
+  tmp_file_path = "tmp.txt"
+  code = os.system(f'reg query "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun > "{tmp_file_path}"')
+  if code != 0:
+    print("Error reading system registry")
+    sys.exit()
+
+  # read tmpfile and get all paths in AutoRun
+  with open(tmp_file_path, "r") as txtfile:
+    lines = txtfile.readlines()
+  # delete the tmp file
+  os.remove(tmp_file_path)
+  # find existing paths
+  for line in lines:
+    if "AutoRun" in line:
+      # get the list of all paths in value "AutoRun"
+      line_elements = line.split()
+      if len(line_elements) == 2:
+        paths = []
+      else:  
+        paths = line_elements[2].split("&")
+  # add commands.bat file full path to the values
+  if commands_bat_full_path_str not in paths:
+    paths.append(commands_bat_full_path_str)
+
+  # join all paths separated bu
+  concatenated_paths = " & ".join(paths)
+  print(concatenated_paths)
+  code = os.system(f'reg add "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun /t REG_SZ /d "{concatenated_paths}" /f')
+  if code != 0:
+    print("Error accessing system registry: run this file as administrator")
+    sys.exit()
 
 
-  # TODO add automatically file to regedit...
 
-
+# linux and (i hope :) macOS Setup
 elif os.name == "posix":
   # TODO
   pass
@@ -118,4 +153,6 @@ else:
   raise OSError(f"Your os {os.name} is not supported")
 
 
-os.system("pause")
+
+
+print("The PW setup has been completed successfully.")
