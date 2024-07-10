@@ -1,0 +1,6 @@
+__pycache__/
+Data/pw_objects.json
+Data/config.json
+Data/check_pw.txt
+Data/commands.bat
+Data/commands.sh
