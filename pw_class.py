@@ -1,8 +1,6 @@
 from Data.constants import PW_OBJECTS, encrypt_str, decrypt_str, decrypt_str_list
-from cryptography.fernet import Fernet
 from getpass import getpass
-import json
-import os
+import os, json
 
 
 
@@ -243,11 +241,31 @@ def get_pw_from_json(site_query:str) -> str:
   Output:
   returns decrypted password from chosen username and email
   """
-  site = find_full_site_names(site_query, show_print=False)[0]
+  sites = find_full_site_names(site_query)
+  # base case: no sites found
+  if sites == [""]:
+    raise ValueError("No sites found")
+  # rapid case: only one site found
+  if len(sites) == 1:
+    site = sites[0]
+  # rapid case: site query is a full site name
+  elif site_query in sites:
+    site = site_query
+  # general case: more than one site
+  else:
+    # enumerate sites and choose one
+    for i, site in enumerate(sites):
+      print(f" {i+1}. {site}")
+    # ask for index
+    selected_idx = int(input("\nSelect site number: ")) - 1
+    site = sites[selected_idx]
+
+  # create pw obj list from chosen site
   obj_list = create_objects_from_json(site)
   # rapid case: a single pw linked to site
   if len(obj_list) == 1:
-    print(obj_list[0].print_site())
+    obj = obj_list[0]
+    print(obj.print_site())
     return obj_list[0].get_pw()
   # case with more accounts
   else:
@@ -255,12 +273,12 @@ def get_pw_from_json(site_query:str) -> str:
     emails = [obj.email for obj in obj_list]
     # print choiches
     for i, (username, email) in enumerate(zip(usernames, emails)):
-      print(f"{i+1}. username: {username}, email: {email}")
+      print(f" {i+1}. username: {username}, email: {email}")
     # select account
-    selected_index = int(input("Select an account number: ")) - 1
-  
-    print(obj_list[selected_index].print_site())
-    return obj_list[selected_index].get_pw()
+    selected_index = int(input("\nSelect an account number: ")) - 1
+    obj = obj_list[selected_index]
+    print(obj.print_site())
+    return obj.get_pw()
 
 
 def copy_pw_from_json(site_query:str) -> None:
@@ -270,6 +288,7 @@ def copy_pw_from_json(site_query:str) -> None:
   pw = get_pw_from_json(site_query)
   if os.name == "nt":
     os.system(f'echo {pw}| clip')
+    print("\nPassword copied to clipboard")
   elif os.name == "posix":
     # TODO 
     print("TODO")

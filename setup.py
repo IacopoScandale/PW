@@ -118,25 +118,4 @@ else:
   raise OSError(f"Your os {os.name} is not supported")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 os.system("pause")

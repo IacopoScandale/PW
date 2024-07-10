@@ -109,7 +109,7 @@ def generate_fernet_key(passphrase:str=None):
   - bytes: The Fernet key.
   """
   if passphrase is None:
-    passphrase = getpass(prompt="Enter PW password: ")
+    passphrase = getpass(prompt="\nEnter PW password: ")
   kdf = PBKDF2HMAC(
     algorithm=hashes.SHA256(),
     length=32,
@@ -155,7 +155,7 @@ def encrypt_str_list(decrypted_msg:list[str], pw:str=None, check:bool=True) -> l
   """
   # ask user for password if pw is None
   if pw is None:
-    pw = getpass(prompt="Enter PW password: ")
+    pw = getpass(prompt="\nEnter PW password: ")
   # check if pw is correct
   if check is True:
     if check_pw(pw) is False:
