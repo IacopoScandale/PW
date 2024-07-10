@@ -7,14 +7,14 @@ Output: prints some infos linked to chosen site found from site query
 
 from Data.constants import help_and_error
 from pw_class import find_full_site_names, create_objects_from_json, print_all_pw
-import sys
-
-
+import os, sys
 
 
 # argv[1] is given from commands.bat or commands.sh file: it is True or False and goes to `print_all_pw`
 # argv[2] is the site query
 help_and_error(help_message, sys.argv, 2)
+# change directory to main project directory
+os.chdir(os.path.dirname(sys.argv[0]))
 # argv[1] print_pw
 print_pw = sys.argv[1]
 if print_pw == "True":
