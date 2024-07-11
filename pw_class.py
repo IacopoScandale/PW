@@ -260,6 +260,7 @@ def get_pw_from_json(site_query:str) -> str:
     selected_idx = int(input("\nSelect site number: ")) - 1
     site = sites[selected_idx]
 
+  print(f"\nSite: {site}")
   # create pw obj list from chosen site
   obj_list = create_objects_from_json(site)
   # rapid case: a single pw linked to site
@@ -285,7 +286,13 @@ def copy_pw_from_json(site_query:str) -> None:
   """
   copies pw in the clipboard
   """
-  pw = get_pw_from_json(site_query)
+  # case no sites found
+  try:
+    pw = get_pw_from_json(site_query)
+  except ValueError as e:
+    print(e)
+    return
+  
   if os.name == "nt":
     os.system(f'echo {pw}| clip')
     print("\nPassword copied to clipboard")
@@ -308,7 +315,7 @@ def find_full_site_names(site_query:str, show_print:bool=False) -> list[str]:
   sites = [site for site in pw_objects.keys() if site_query in site]
   # case no sites
   if sites == []:
-    print("Zero sites found")
+    # print("Zero sites found")
     return [""]
   # print case
   if show_print is True:

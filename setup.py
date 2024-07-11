@@ -1,6 +1,6 @@
 import os, sys, json
 from Data.constants import PW_OBJECTS, CONFIG_JSON, CHECK_PW, COMMANDS_BAT, COMMANDS_SH, encrypt_str
-from Data.constants import PW_ADD_COMM_NAME, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME, PW_COPY_SITE_PW
+from Data.constants import PW_ADD_COMM_NAME, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME, PW_COPY_SITE_PW, PW_HELP
 from getpass import getpass
 """
 PW Setup: Call this file as Administrator!
@@ -90,7 +90,8 @@ if os.name == "nt":
   commands += windows_alias_command_line(PW_ALL_INFO_COMM_NAME, "pw_site_info.py", args="True")
   # copy pw to clipboard
   commands += windows_alias_command_line(PW_COPY_SITE_PW, "pw_copy.py")
-
+  # pw help
+  commands += windows_alias_command_line(PW_HELP, "pw_help.py")
 
   # TODO add more commands
 

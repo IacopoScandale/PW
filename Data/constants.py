@@ -64,9 +64,14 @@ PW_ALL_INFO_COMM_NAME = "pw_.all_info"
 Alias name calling `pw_site_info.py True`
 """
 
-PW_COPY_SITE_PW = "pw_"
+PW_COPY_SITE_PW = "pw_.copy"
 """
 Alias name calling `pw_copy.py`
+"""
+
+PW_HELP = "pw_"
+"""
+Alias name calling ``
 """
 
 

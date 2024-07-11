@@ -6,7 +6,7 @@ Output: prints some infos linked to chosen site found from site query
 """
 
 from Data.constants import help_and_error
-from pw_class import find_full_site_names, create_objects_from_json, print_all_pw
+from pw_class import find_full_site_names, print_all_pw
 import os, sys
 
 
