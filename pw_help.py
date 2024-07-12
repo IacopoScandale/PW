@@ -21,7 +21,3 @@ for i, cmd in enumerate(command_names):
   print(f" {i+1}.\t{cmd}")
 
 print("\n (type '`command_name` -h' for more info)")
-
-
-
-

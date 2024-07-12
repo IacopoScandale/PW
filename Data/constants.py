@@ -1,6 +1,5 @@
 from sys import exit
 from cryptography.fernet import Fernet
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from base64 import urlsafe_b64encode
@@ -17,6 +16,11 @@ Name of the folder containg config files etc
 PW_OBJECTS = os.path.join(DATA_FOLDER_NAME, "pw_objects.json")
 """
 Relative path del file pw_objects.json
+"""
+
+OLD_PW_OBJECTS = os.path.join(DATA_FOLDER_NAME, "OLD_pw_objects.json")
+"""
+Relative path of file `pw_objects.json` when renamed by `uninstall.py`
 """
 
 PW_JSON = os.path.join(DATA_FOLDER_NAME, "pw.json")
@@ -71,7 +75,7 @@ Alias name calling `pw_copy.py`
 
 PW_HELP = "pw_"
 """
-Alias name calling ``
+Alias name calling `pw_help.py`
 """
 
 
@@ -79,14 +83,14 @@ def help_and_error(help_message:str, argv:list, argument_number:int=None) -> Non
   """
   Input
   -----
-    * `help_message`: str multilinea contenente il messaggio di --help quando si scrive e.g.: "my_command --help"
-    * `argv`: lista del modulo sys contenente gli argomenti
+    * `help_message`: multiline str containing --help message when you type: "my_command --help"
+    * `argv`: sys.argv list containing command arguments
     * `argument_number`: exact number of arguments (if None it does not matter)
   
   Output 
   ------
-    * Stampa il messaggio di help e blocca l'esecuzione del comando se si scrive 'nome_comando --help'
-    * Stampa il messaggio di errore e blocca l'esecuzione del comando se si sbaglia il numero di argomenti
+    * Prints help message and stops command execution when you type 'nome_comando --help'
+    * Prints error message and stops command execution when `argument_number` is wrong
   """
   # help
   if len(argv) > 1 and (argv[1] == "--help" or argv[1] == "-h"):

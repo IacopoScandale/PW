@@ -106,10 +106,10 @@ if os.name == "nt":
 
   # add automatically commands.bat file to regedit AutoRun Value in Command Processor
   tmp_file_path = "tmp.txt"
-  code = os.system(f'reg query "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun > "{tmp_file_path}"')
-  if code != 0:
-    print("Error reading system registry")
-    sys.exit()
+  try:
+    os.system(f'reg query "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun > "{tmp_file_path}"')
+  except:
+    print("Error: you must run this script as administrator")
 
   # read tmpfile and get all paths in AutoRun
   with open(tmp_file_path, "r") as txtfile:
@@ -120,22 +120,24 @@ if os.name == "nt":
   for line in lines:
     if "AutoRun" in line:
       # get the list of all paths in value "AutoRun"
-      line_elements = line.split()
-      if len(line_elements) == 2:
+      paths_in_line = line[21:].strip()
+      if paths_in_line == "": # case: no paths
         paths = []
-      else:  
-        paths = line_elements[2].split("&")
+      elif " & " in paths_in_line: # case: more than a path
+        paths = paths_in_line.split(" & ")
+      else: # case: a single path
+        paths = [paths_in_line]
+      
+
   # add commands.bat file full path to the values
   if commands_bat_full_path_str not in paths:
     paths.append(commands_bat_full_path_str)
 
-  # join all paths separated bu
+  # join all paths separated by &
   concatenated_paths = " & ".join(paths)
-  print(concatenated_paths)
-  code = os.system(f'reg add "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun /t REG_SZ /d "{concatenated_paths}" /f')
-  if code != 0:
-    print("Error accessing system registry: run this file as administrator")
-    sys.exit()
+  # print(concatenated_paths)
+  os.system(f'reg add "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun /t REG_SZ /d "{concatenated_paths}" /f')
+
 
 
 
@@ -156,4 +158,4 @@ else:
 
 
 
-print("The PW setup has been completed successfully.")
+print("PW setup has been completed successfully.")
