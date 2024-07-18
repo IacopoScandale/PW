@@ -1,6 +1,6 @@
 import os, sys, json
 from Data.constants import PW_OBJECTS, CONFIG_JSON, CHECK_PW, COMMANDS_BAT, COMMANDS_SH, encrypt_str
-from Data.constants import PW_ADD_COMM_NAME, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME, PW_COPY_SITE_PW, PW_HELP
+from Data.constants import PW_ADD_COMM_NAME, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME, PW_COPY_SITE_PW, PW_HELP, PIP_VENV_WIN, PIP_VENV_LINUX, PYTHON_VENV_WIN
 from getpass import getpass
 """
 PW Setup: Call this file as Administrator!
@@ -16,15 +16,20 @@ print("=================================",end="\n\n")
 
 
 # install location
-print("· Check if folder PW is in following path, otherwise insert it manually or call this file from terminal\n")
-ans_loc = input(f"Installing PW in current location: {os.getcwd()}?\n [Y,n]: ")
-if ans_loc in "yYsS":
-  pass
-elif ans_loc in "nN":
-  ans_loc = input("Insert location or restart installing from location:\n ")
-  os.chdir(ans_loc)
-else:
-  raise ValueError("answer must be 'y' or 'n'")
+# get the full path of this file
+this_file_full_path = os.path.abspath(__file__)
+# get full path of project folder
+main_folder_full_path = os.path.dirname(this_file_full_path)
+# move to that directory
+os.chdir(main_folder_full_path)
+
+
+# create virtual environment
+if not os.path.exists("venv"):
+  print("Creating Virtual Environment 'venv'...")
+  os.system(f"{sys.executable} -m venv venv")  
+  print("Done!\n")
+
 
 
 # create `Data/pw_objects.json` if it does not exists (otherwise passwords could be lost)
@@ -33,21 +38,26 @@ if not os.path.exists(PW_OBJECTS):
   with open(PW_OBJECTS, "w") as jsonfile:
     json.dump(dict(), jsonfile)
 else:
-  raise OSError("Cannot delete 'pw_objects.json' file: it could contain some important data.\nMove or delete it and restart setup.py")
+  print("Cannot delete 'pw_objects.json' file: it could contain some important data.\nMove or delete it and restart setup")
+  sys.exit()
 
 
-# write path in `Data/config.json` dict
-config = dict()
-config["main folder path"] = os.getcwd()
-# save json config file
-with open(CONFIG_JSON, "w") as jsonfile:
-  json.dump(config, jsonfile, indent=2)
+# # write path in `Data/config.json` dict
+# config = dict()
+# config["main folder path"] = os.getcwd()
+# # save json config file
+# with open(CONFIG_JSON, "w") as jsonfile:
+#   json.dump(config, jsonfile, indent=2)
 
 
-# install cryptography (TODO try in an environment)
-print("\nInstalling from file requirements.txt")
-os.system("pip install -r requirements.txt")
-
+# install from requirements.txt in virtual environment
+print("\nInstalling Dependencies...")
+if os.name == "nt": # Windows
+  os.system(f"{PIP_VENV_WIN} install -r requirements.txt")
+  print("Done!\n")
+elif os.name == "posix":
+  os.system(f"{PIP_VENV_LINUX} install -r requirements.txt")
+  print("Done!\n")
 
 # ask for PW password
 print("\nCreate your PW password:")
@@ -59,27 +69,32 @@ pw_check = getpass("Confirm PW password: ")
 if pw != pw_check:
   raise ValueError("Passwords do not match")
 # encrypt word main path message using pw
-encrypt_msg = encrypt_str(config["main folder path"], pw, check=False)
+encrypt_msg = encrypt_str(os.getcwd(), pw, check=False)
 # create `check_pw.txt file`
 with open(CHECK_PW, "w") as txtfile:
   # write some encrypted text
   txtfile.write(encrypt_msg)
 
 
-def windows_alias_command_line(command_name:str, filename_py:str, args:str="") -> str:
-  """
-  Create windows command line for file comands.bat
-  Input:
-  - `filename_py:str` name of the python file to call
-  - `command_name:str` name of the alias
-  - `args:str=""` insert other default arguments (separated by a space) if needed
-  """
-  command_file_path = os.path.join(os.getcwd(), filename_py)
-  return f"doskey {command_name} = python {command_file_path} {args} $*\n"
 
 # TODO create .bat and .sh aliases files
 # Windows Setup
 if os.name == "nt":
+  python_venv_full_path = os.path.join(os.getcwd(), PYTHON_VENV_WIN)
+
+
+  def windows_alias_command_line(command_name:str, filename_py:str, args:str="") -> str:
+    """
+    Create windows command line for file comands.bat
+    Input:
+    - `filename_py:str` name of the python file to call
+    - `command_name:str` name of the alias
+    - `args:str=""` insert other default arguments (separated by a space) if needed
+    """
+    command_file_path = os.path.join(os.getcwd(), filename_py)
+    return f"doskey {command_name} = {python_venv_full_path} {command_file_path} {args} $*\n"
+
+
   # windows echo off
   commands = "@echo off\n\n"
   # pw.add command
@@ -94,22 +109,26 @@ if os.name == "nt":
   commands += windows_alias_command_line(PW_HELP, "pw_help.py")
 
   # TODO add more commands
-
+  print("Done!\n")  
 
   
   # Write commands on commands.bat file
   with open(COMMANDS_BAT, "w") as txtfile:
     txtfile.write(commands)
 
-  # add two "" for being sure that paths that contain spaces will be supported (in regedit it will write exactly "path" with one ")
-  commands_bat_full_path_str = '""' + os.path.join(os.getcwd(), COMMANDS_BAT) + '""'
 
+  # Regedit Part
+  # path is inside \"...\" because in this way paths containing spaces are supported
+  print("Adding commands to regedit AutoRun...")
+  commands_bat_full_path_str = f'\\"{os.path.join(os.getcwd(), COMMANDS_BAT)}\\"'
+  
   # add automatically commands.bat file to regedit AutoRun Value in Command Processor
   tmp_file_path = "tmp.txt"
   try:
     os.system(f'reg query "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun > "{tmp_file_path}"')
   except:
     print("Error: you must run this script as administrator")
+    sys.exit()
 
   # read tmpfile and get all paths in AutoRun
   with open(tmp_file_path, "r") as txtfile:
@@ -120,14 +139,24 @@ if os.name == "nt":
   for line in lines:
     if "AutoRun" in line:
       # get the list of all paths in value "AutoRun"
-      paths_in_line = line[21:].strip()
-      if paths_in_line == "": # case: no paths
+      paths = line[21:].strip().split("&")
+      # base case if no paths in regedit AutoRun: otherwise then " & ".join(paths)
+      # joins "" and break windows terminal
+      if paths == [""]:
         paths = []
-      elif " & " in paths_in_line: # case: more than a path
-        paths = paths_in_line.split(" & ")
-      else: # case: a single path
-        paths = [paths_in_line]
       
+
+  # if a path starts and ends with ", we must add \ in front of "
+  for i, path in enumerate(paths):
+    # strip every path: it could contain spaces because we are splitting with "&"
+    # but each path could be separated with " & "
+    path = path.strip()
+    if path.startswith('"') and path.endswith('"'):
+      # add \ in front of each "
+      path = f'\\"{path[1:-1]}\\"'
+    # refresh path in paths list
+    paths[i] = path
+
 
   # add commands.bat file full path to the values
   if commands_bat_full_path_str not in paths:
@@ -138,7 +167,7 @@ if os.name == "nt":
   # print(concatenated_paths)
   os.system(f'reg add "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun /t REG_SZ /d "{concatenated_paths}" /f')
 
-
+  print("Done!\n")
 
 
 # linux and (i hope :) macOS Setup

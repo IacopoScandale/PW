@@ -1,4 +1,5 @@
 __pycache__/
+venv
 Data/pw_objects.json
 Data/OLD_pw_objects.json
 Data/config.json

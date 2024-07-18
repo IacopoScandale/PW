@@ -6,7 +6,11 @@ from base64 import urlsafe_b64encode
 from getpass import getpass
 import os
 
+PIP_VENV_WIN = "venv\\Scripts\\pip3.exe"
+PIP_VENV_LINUX = ""
 
+PYTHON_VENV_WIN = "venv\\Scripts\\python.exe"
+PYTHON_VENV_LINUX = ""
 
 DATA_FOLDER_NAME = "Data"
 """
@@ -104,7 +108,7 @@ def help_and_error(help_message:str, argv:list, argument_number:int=None) -> Non
       exit()
 
 
-def generate_fernet_key(passphrase:str=None):
+def generate_fernet_key(passphrase:str|None=None):
   """
   Derive a cryptographic key from a passphrase using PBKDF2 and then
   derive a Fernet key and write it into a key file
