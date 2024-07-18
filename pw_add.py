@@ -11,7 +11,7 @@ Usage:
 """
 
 from pw_class import PW
-from Data.constants import help_and_error
+from data.constants import help_and_error
 import os, sys
 
 

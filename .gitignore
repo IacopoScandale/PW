@@ -1,8 +1,8 @@
 __pycache__/
 venv
-Data/pw_objects.json
-Data/OLD_pw_objects.json
-Data/config.json
-Data/check_pw.txt
-Data/commands.bat
-Data/commands.sh
+data/pw_objects.json
+data/OLD_pw_objects.json
+data/config.json
+data/check_pw.txt
+data/commands.bat
+data/commands.sh

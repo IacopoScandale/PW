@@ -1,6 +1,6 @@
 import os, sys, json
-from Data.constants import PW_OBJECTS, CONFIG_JSON, CHECK_PW, COMMANDS_BAT, COMMANDS_SH, encrypt_str
-from Data.constants import PW_ADD_COMM_NAME, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME, PW_COPY_SITE_PW, PW_HELP, PIP_VENV_WIN, PIP_VENV_LINUX, PYTHON_VENV_WIN
+from data.utils import encrypt_str
+from data import strings
 from getpass import getpass
 """
 PW Setup: Call this file as Administrator!
@@ -33,9 +33,9 @@ if not os.path.exists("venv"):
 
 
 # create `Data/pw_objects.json` if it does not exists (otherwise passwords could be lost)
-if not os.path.exists(PW_OBJECTS):
+if not os.path.exists(strings.PW_OBJECTS):
   # if it does not exist: create pw_objects.json as empty dictionary
-  with open(PW_OBJECTS, "w") as jsonfile:
+  with open(strings.PW_OBJECTS, "w") as jsonfile:
     json.dump(dict(), jsonfile)
 else:
   print("Cannot delete 'pw_objects.json' file: it could contain some important data.\nMove or delete it and restart setup")
@@ -53,10 +53,10 @@ else:
 # install from requirements.txt in virtual environment
 print("\nInstalling Dependencies...")
 if os.name == "nt": # Windows
-  os.system(f"{PIP_VENV_WIN} install -r requirements.txt")
+  os.system(f"{strings.PIP_VENV_WIN} install -r requirements.txt")
   print("Done!\n")
 elif os.name == "posix":
-  os.system(f"{PIP_VENV_LINUX} install -r requirements.txt")
+  os.system(f"{strings.PIP_VENV_LINUX} install -r requirements.txt")
   print("Done!\n")
 
 # ask for PW password
@@ -71,7 +71,7 @@ if pw != pw_check:
 # encrypt word main path message using pw
 encrypt_msg = encrypt_str(os.getcwd(), pw, check=False)
 # create `check_pw.txt file`
-with open(CHECK_PW, "w") as txtfile:
+with open(strings.CHECK_PW, "w") as txtfile:
   # write some encrypted text
   txtfile.write(encrypt_msg)
 
@@ -80,7 +80,7 @@ with open(CHECK_PW, "w") as txtfile:
 # TODO create .bat and .sh aliases files
 # Windows Setup
 if os.name == "nt":
-  python_venv_full_path = os.path.join(os.getcwd(), PYTHON_VENV_WIN)
+  python_venv_full_path = os.path.join(os.getcwd(), strings.PYTHON_VENV_WIN)
 
 
   def windows_alias_command_line(command_name:str, filename_py:str, args:str="") -> str:
@@ -98,29 +98,29 @@ if os.name == "nt":
   # windows echo off
   commands = "@echo off\n\n"
   # pw.add command
-  commands += windows_alias_command_line(PW_ADD_COMM_NAME, "pw_add.py")
+  commands += windows_alias_command_line(strings.PW_ADD_COMM_NAME, "pw_add.py")
   # pw.info command
-  commands += windows_alias_command_line(PW_INFO_COMM_NAME, "pw_site_info.py", args="False")
+  commands += windows_alias_command_line(strings.PW_INFO_COMM_NAME, "pw_site_info.py", args="False")
   # pw.all_info command
-  commands += windows_alias_command_line(PW_ALL_INFO_COMM_NAME, "pw_site_info.py", args="True")
+  commands += windows_alias_command_line(strings.PW_ALL_INFO_COMM_NAME, "pw_site_info.py", args="True")
   # copy pw to clipboard
-  commands += windows_alias_command_line(PW_COPY_SITE_PW, "pw_copy.py")
+  commands += windows_alias_command_line(strings.PW_COPY_SITE_PW, "pw_copy.py")
   # pw help
-  commands += windows_alias_command_line(PW_HELP, "pw_help.py")
+  commands += windows_alias_command_line(strings.PW_HELP, "pw_help.py")
 
   # TODO add more commands
   print("Done!\n")  
 
   
   # Write commands on commands.bat file
-  with open(COMMANDS_BAT, "w") as txtfile:
+  with open(strings.COMMANDS_BAT, "w") as txtfile:
     txtfile.write(commands)
 
 
   # Regedit Part
   # path is inside \"...\" because in this way paths containing spaces are supported
   print("Adding commands to regedit AutoRun...")
-  commands_bat_full_path_str = f'\\"{os.path.join(os.getcwd(), COMMANDS_BAT)}\\"'
+  commands_bat_full_path_str = f'\\"{os.path.join(os.getcwd(), strings.COMMANDS_BAT)}\\"'
   
   # add automatically commands.bat file to regedit AutoRun Value in Command Processor
   tmp_file_path = "tmp.txt"

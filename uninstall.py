@@ -3,7 +3,7 @@ Run this from project folder from terminal as Administrator
 """
 
 import os, sys
-from Data.constants import CONFIG_JSON, COMMANDS_BAT, COMMANDS_SH, CHECK_PW, PW_OBJECTS, OLD_PW_OBJECTS
+from data.strings import CONFIG_JSON, COMMANDS_BAT, COMMANDS_SH, CHECK_PW, PW_OBJECTS, OLD_PW_OBJECTS
 
 
 # title
