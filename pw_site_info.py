@@ -5,7 +5,7 @@ Usage: pw.info_pw <site_query>
 Output: prints some infos linked to chosen site found from site query
 """
 
-from data.utils import help_and_error
+from data_tmp.utils import help_and_error
 from pw_class import find_full_site_names, print_all_pw
 import os, sys
 

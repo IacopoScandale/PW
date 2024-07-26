@@ -1,6 +1,6 @@
 import os, sys, json
-from data.utils import encrypt_str
-from data import strings
+from data_tmp.utils import encrypt_str
+from data_tmp import strings
 from getpass import getpass
 """
 PW Setup: Call this file as Administrator!

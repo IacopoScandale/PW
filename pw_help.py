@@ -4,8 +4,8 @@ Usage: pw
 Output: displays all pw commands
 """
 
-from data.utils import help_and_error
-from data.strings import PW_ADD_COMM_NAME, PW_COPY_SITE_PW, PW_HELP, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME
+from data_tmp.utils import help_and_error
+from data_tmp.strings import PW_ADD_COMM_NAME, PW_COPY_SITE_PW, PW_HELP, PW_INFO_COMM_NAME, PW_ALL_INFO_COMM_NAME
 import sys
 
 
