@@ -1,5 +1,5 @@
-from data_tmp.utils import encrypt_str, decrypt_str, decrypt_str_list
-from data_tmp.strings import PW_OBJECTS
+from data.utils import encrypt_str, decrypt_str, decrypt_str_list
+from data.strings import PW_OBJECTS
 from getpass import getpass
 import os, json
 
