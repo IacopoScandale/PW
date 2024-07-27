@@ -1,5 +1,6 @@
-from data.utils import encrypt_str, decrypt_str, decrypt_str_list
-from data.strings import PW_OBJECTS
+from data.utils import encrypt_str, decrypt_str, decrypt_str_list, generate_fernet_key
+from data.strings import PW_OBJECTS, PW_CSV
+from cryptography.fernet import Fernet
 from getpass import getpass
 import os, json
 
@@ -325,8 +326,30 @@ def find_full_site_names(site_query:str, show_print:bool=False) -> list[str]:
   return sites
 
 
-
-
+def create_csv_pw_file() -> None:
+  """
+  Create a csv file with all passwords
+  """
+  # load `pw_objects.json`
+  with open(PW_OBJECTS, "r") as jsonfile:
+    pw_objects = json.load(jsonfile)
+  # raise error if file exists to avoid pw deletion
+  if os.path.exists(PW_CSV):
+    raise FileExistsError(f"File {PW_CSV} already exists. Delete or move it and retry")
+  # generate key (i tried not to do this, but it is the fastest way)
+  key = generate_fernet_key()
+  # write on it
+  with open(PW_CSV, "w") as csvfile:
+    file_content = "site,username,email,password,other\n"
+    for site in pw_objects:
+      for pw_obj in create_objects_from_json(site):
+        cur_pw = Fernet(key).decrypt(pw_obj.encrypted_pw.encode()).decode()
+        other_str = ", ".join(pw_obj.other)
+        file_content += f'"{pw_obj.site}","{pw_obj.username}","{pw_obj.email}","{cur_pw}","{other_str}"\n'
+    # write content on it
+    csvfile.write(file_content)
+    # del some variables
+    del(key); del(file_content); del(cur_pw)
 
 
 
@@ -339,6 +362,7 @@ def find_full_site_names(site_query:str, show_print:bool=False) -> list[str]:
 
 if __name__ == "__main__":
   pass
+  # create_csv_pw_file()
   # prova = PW("prova.com",None,"ciao@.com","ciaociao123",["my name is Iacopo","The code is 12346"])
   # prova.change_pw("pizzocalabro")
   # print(prova.print_site_pw())

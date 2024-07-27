@@ -13,17 +13,17 @@ Name of the folder containg config files etc
 
 PW_OBJECTS = os.path.join(DATA_FOLDER_NAME, "pw_objects.json")
 """
-Relative path del file pw_objects.json
+Relative path of file `pw_objects.json`
+"""
+
+PW_CSV = os.path.join(DATA_FOLDER_NAME, "pw.csv")
+"""
+Relative path of file `pw.csv`
 """
 
 OLD_PW_OBJECTS = os.path.join(DATA_FOLDER_NAME, "OLD_pw_objects.json")
 """
 Relative path of file `pw_objects.json` when renamed by `uninstall.py`
-"""
-
-PW_JSON = os.path.join(DATA_FOLDER_NAME, "pw.json")
-"""
-Relative path del file pw.json
 """
 
 CHECK_PW = os.path.join(DATA_FOLDER_NAME, "check_pw.txt")

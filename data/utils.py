@@ -1,10 +1,10 @@
-from data.strings import CHECK_PW
+from data.strings import CHECK_PW, PW_OBJECTS, PW_CSV
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from base64 import urlsafe_b64encode
 from getpass import getpass
-import sys
+import os, sys, json
 
 
 def help_and_error(help_message:str, argv:list, argument_number:int=None) -> None:
@@ -78,7 +78,7 @@ def decrypt_str(encrypted_msg:str, pw:str=None) -> str:
   return decrypt_str_list([encrypted_msg], pw)[0]
 
 
-def encrypt_str_list(decrypted_msg:list[str], pw:str=None, check:bool=True) -> list[str]:
+def encrypt_str_list(decrypted_msg:list[str], pw:str|None=None, check:bool=True) -> list[str]:
   """
   Encrypts a str `decrypted_msg`, but first checks if pw is correct
   using `check_pw` function.
@@ -130,4 +130,4 @@ def check_pw(pw:str) -> bool:
     decrypt_str(encrypted_msg, pw)
     return True
   except:
-    return False
+    return False  

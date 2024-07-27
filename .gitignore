@@ -6,3 +6,4 @@ data/config.json
 data/check_pw.txt
 data/commands.bat
 data/commands.sh
+data/pw.csv
