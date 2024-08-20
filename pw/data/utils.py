@@ -1,35 +1,39 @@
-from data.strings import CHECK_PW, PW_OBJECTS, PW_CSV
+from .strings import CHECK_PW, COUNTER_JSON_NAME
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from base64 import urlsafe_b64encode
 from getpass import getpass
-import os, sys, json
+import os
+import sys
+import json
 
 
-def help_and_error(help_message:str, argv:list, argument_number:int=None) -> None:
+def add_one_to_counter(command_name: str) -> None:
   """
-  Input
-  -----
-    * `help_message`: multiline str containing --help message when you type: "my_command --help"
-    * `argv`: sys.argv list containing command arguments
-    * `argument_number`: exact number of arguments (if None it does not matter)
-  
-  Output 
-  ------
-    * Prints help message and stops command execution when you type 'nome_comando --help'
-    * Prints error message and stops command execution when `argument_number` is wrong
+  Call this function at the end of a command_file.py to
+  add +1 usage to the counter. This counter will save
+  how many times we use that command
   """
-  # help
-  if len(argv) > 1 and (argv[1] == "--help" or argv[1] == "-h"):
-    print(help_message)
+  here: str = os.path.dirname(os.path.abspath(__file__))
+  full_path_counter_json: str = os.path.join(here, COUNTER_JSON_NAME)
+
+  # create file if it does not exists
+  if not os.path.exists(full_path_counter_json):
+    print(f"Error: missing file {full_path_counter_json}")
     sys.exit()
-  # wrong arg number
-  if argument_number is not None:
-    if len(argv) != argument_number + 1:
-      print(f"ERROR: Wrong Argument Number ({len(argv)-1} instead of {argument_number})")
-      print("type 'command_name --help' for more info")
-      sys.exit()
+
+  with open(full_path_counter_json, "r") as jsonfile:
+    # load dictionary
+    counter_json: dict[str,int] = json.load(jsonfile)
+  # add +1 to the frequency dictionary
+  if command_name not in counter_json:
+    counter_json[command_name] = 1
+  else:
+    counter_json[command_name] += 1
+  # save progress
+  with open(full_path_counter_json, "w") as jsonfile:
+    json.dump(counter_json, jsonfile, indent=2)
 
 
 def generate_fernet_key(passphrase:str|None=None):

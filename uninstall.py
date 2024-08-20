@@ -1,111 +1,106 @@
-"""
-Run this from project folder from terminal as Administrator
-"""
-
-import os, sys
-from data.strings import CONFIG_JSON, COMMANDS_BAT, COMMANDS_SH, CHECK_PW, PW_OBJECTS, OLD_PW_OBJECTS
+from pw.data.strings import *
+import subprocess
+import os
+import sys
 
 
-# title
-print("=================================")
-print("||        PW UNINSTALL         ||")
-print("=================================",end="\n\n")
-
-# info
-print("This uninstaller is going only to un-do 'setup.py'")
-print("It requires to be run as Administrator! otherwise uninstall cannot be fully completed")
-print(f"Moreover file '{PW_OBJECTS}' will be kept and renamed as '{OLD_PW_OBJECTS}',")
-print("in this way pw data will be preserved (but passwords will be encrypted with your previous PW password!)\n")
+def print_path(path: str) -> None:
+  paths: list[str] = path.split(os.pathsep)
+  for path in paths:
+    print(path)
 
 
-# get the full path of this file
-this_file_full_path = os.path.abspath(__file__)
-# get full path of project folder
-main_folder_full_path = os.path.dirname(this_file_full_path)
-# move to that directory
-os.chdir(main_folder_full_path)
+def remove_folder(folder: str) -> None:
+  """
+  Recursively deletes a folder and all folders and files inside
+  """
+  if os.name == "nt":
+    command: str = 'rmdir /s /q "{folder}"'
+  elif os.name == "posix":
+    command: str = 'rm -rf {folder}'
+  else:
+    raise OSError(f"your os {os.name} is not supported")
+
+  os.system(command.format(folder=folder))
 
 
-# delete files `check_pw.txt` and `config.json`
-if os.path.exists(CONFIG_JSON):
-  os.remove(CONFIG_JSON)
-if os.path.exists(CHECK_PW):
-  os.remove(CHECK_PW)
+def remove_paths_from_PATH(path_to_remove: str) -> None:
+  """
+  Removes `path_to_remove` from local PATH variable
+  """
+  # current_PATH: str = os.environ.get('PATH', '')
+  # print_path(current_PATH)
+  # input()
+  if os.name == "nt":
+    get_user_path_command: str = "reg query HKCU\\Environment /v PATH"
+    overwrite_path_command: str = 'setx PATH "{path_content}"'
+  elif os.name == "posix":
+    get_user_path_command: str = ""
+    overwrite_path_command: str = ""
+    raise NotImplementedError
+  else:
+    raise OSError(f"your os {os.name} is not supported")
 
-# rename file `pw_objects.json` for not loosing data
-if os.path.exists(OLD_PW_OBJECTS):
-  print(f"ERROR: file {OLD_PW_OBJECTS} already exists.")
-  print("If you want to uninstall PW move or delete that file")
-  sys.exit()
+  # get only user path
+  result = subprocess.run(
+    get_user_path_command, 
+    capture_output=True, 
+    text=True,  # ensure str as output
+    shell=True
+  )
+  output = result.stdout
+  for line in output.splitlines():
+    if "PATH" in line:
+      user_PATH: str = line.split("    ")[-1]
 
-if os.path.exists(PW_OBJECTS):
-  os.rename(PW_OBJECTS, OLD_PW_OBJECTS)
-
-# windows
-if os.name == "nt": 
-  # commands.bat full path
-  # add one " for being sure that paths that contain spaces will be supported (in regedit it will write exactly "path" with one ")
-  commands_bat_full_path_str = f'\\"{os.path.join(os.getcwd(), COMMANDS_BAT)}\\"'
-
-  # get regedit AutoRun paths Values in Command Processor
-  tmp_file_path = "tmp.txt"
-  os.system(f'reg query "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun > "{tmp_file_path}"')
-
-  # read tmpfile and get all paths in AutoRun
-  with open(tmp_file_path, "r") as txtfile:
-    lines = txtfile.readlines()
-  # delete the tmp file
-  os.remove(tmp_file_path)
-  # find existing paths
-  for line in lines:
-    if "AutoRun" in line:
-      # get the list of all paths in value "AutoRun"
-      paths = line[21:].strip().split("&")
-
- 
-  # if a path starts and ends with ", we must add \ in front of "
-  for i, path in enumerate(paths):
-    # strip every path: it could contain spaces because we are splitting with "&"
-    # but each path could be separated with " & "
-    path = path.strip()
-    if path.startswith('"') and path.endswith('"'):
-      # add \ in front of each "
-      path = f'\\"{path[1:-1]}\\"'
-    # refresh path in paths list
-    paths[i] = path
-
-
-  # remove commands.bat file full path from the values
-  if paths != [""]:
-    paths.remove(commands_bat_full_path_str)
-
-  # join all paths separated by &
-  concatenated_paths = " & ".join(paths)
-  # print(concatenated_paths)
-  os.system(f'reg add "HKLM\\SOFTWARE\\Microsoft\\Command Processor" /v AutoRun /t REG_SZ /d "{concatenated_paths}" /f')
-
-  # delete `commands.bat`
-  if os.path.exists(COMMANDS_BAT):
-    os.remove(COMMANDS_BAT)
+  # add path and update variable
+  paths: list[str] = user_PATH.split(os.pathsep)
+  paths = [p for p in paths if p != path_to_remove]
+  new_PATH: str = os.pathsep.join(paths)
+  
+  os.system(overwrite_path_command.format(path_content=new_PATH))
 
 
 
 
+if __name__ == "__main__":
+  # info
+  print(
+    f"NB: file '{os.path.join(PACKAGE_NAME, PW_OBJECTS)}' will be",
+    f"kept and renamed as '{os.path.join(PACKAGE_NAME, OLD_PW_OBJECTS)}'"
+    "\nIn this way pw data will be preserved (but passwords remains",
+    "encrypted with your previous PW password!)\n"
+  )
+  
+  here: str = os.path.dirname(os.path.abspath(__file__))
+  os.chdir(here)
+
+  # remove directories
+  if os.path.exists(COMMANDS_COPY_FOLDER):
+    remove_folder(COMMANDS_COPY_FOLDER)
+  if os.path.exists(VENV_FOLDER):
+    remove_folder(VENV_FOLDER)
+  if os.path.exists(INFO_FOLDER):
+    remove_folder(INFO_FOLDER)
+
+  # remove Commands from PATH
+  path_to_remove: str = os.path.join(here, COMMANDS_COPY_FOLDER)
+  remove_paths_from_PATH(path_to_remove)
 
 
-# linux
-elif os.name == "posix":
+  # delete file `check_pw.txt`
+  check_pw_full_path: str = os.path.join(here, PACKAGE_NAME, CHECK_PW)
+  if os.path.exists(check_pw_full_path):
+    os.remove(check_pw_full_path)
 
+  # if exists old_pw_objects exit and do not overwrite it
+  old_pw_obj_full_path: str = os.path.join(here, PACKAGE_NAME, OLD_PW_OBJECTS)
+  if os.path.exists(old_pw_obj_full_path):
+    print(f"ERROR: file {old_pw_obj_full_path} already exists.")
+    print("If you want to uninstall PW move or delete that file")
+    sys.exit()
 
-
-
-
-
-
-
-
-
-
-  # delete `commands.bat`
-  os.remove(COMMANDS_BAT)
-  # TODO
+  # rename file `pw_objects.json` for not loosing data
+  pw_obj_full_path: str = os.path.join(here, PACKAGE_NAME, PW_OBJECTS)
+  if os.path.exists(pw_obj_full_path):
+    os.rename(pw_obj_full_path, old_pw_obj_full_path)

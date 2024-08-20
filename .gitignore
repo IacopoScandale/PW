@@ -1,9 +1,9 @@
 __pycache__/
 venv
-data/pw_objects.json
-data/OLD_pw_objects.json
-data/config.json
-data/check_pw.txt
-data/commands.bat
-data/commands.sh
-data/pw.csv
+Commands
+pw.egg-info
+pw/data/pw_objects.json
+pw/data/OLD_pw_objects.json
+pw/data/check_pw.txt
+pw/data/usage_counter.json
+pw/data/pw.csv

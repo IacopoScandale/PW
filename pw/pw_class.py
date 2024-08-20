@@ -1,8 +1,10 @@
-from data.utils import encrypt_str, decrypt_str, decrypt_str_list, generate_fernet_key
-from data.strings import PW_OBJECTS, PW_CSV
+from .data.utils import encrypt_str, decrypt_str, decrypt_str_list, generate_fernet_key
+from .data.strings import PW_OBJECTS, PW_CSV
 from cryptography.fernet import Fernet
 from getpass import getpass
-import os, json
+import os
+import sys
+import json
 
 
 
@@ -78,7 +80,7 @@ class PW (object):
     # if site in the database
     if self.site not in pw_objects.keys():  
       pw_objects[self.site] = [value]
-      print("Correctly added pw to the database")
+      print("\nCorrectly added pw to the database")
     # if site not in check if value alredy exists
     elif self.site in pw_objects.keys():
       # cannot use `if value not in pw_objects[self.site]` because same pw is encrypted differently
@@ -86,9 +88,9 @@ class PW (object):
       value_as_objects = [PW.from_dict(dict_obj) for dict_obj in pw_objects[self.site]]
       if self not in value_as_objects:
         pw_objects[self.site].append(value)
-        print("Correctly added pw to the database")
+        print("\nCorrectly added pw to the database")
       else:
-        print("Could not add pw because it alredy exsists in database")
+        print("\nCould not add pw because it alredy exsists in database")
     # save changes
     with open(PW_OBJECTS, "w") as jsonfile:
       json.dump(pw_objects, jsonfile, indent=2)
@@ -352,7 +354,38 @@ def create_csv_pw_file() -> None:
     del(key); del(file_content); del(cur_pw)
 
 
+def print_site_info_command(site_query: str, all_info: bool = False) -> None:
+  sites = find_full_site_names(site_query)
 
+  # case no sites found
+  if sites == [""]:
+    print("\nNo sites found in the database")
+    sys.exit()
+
+  # rapid case when site_query == site
+  if site_query in sites:
+    site = site_query
+    # print site accounts
+    print_all_pw(site, all_info)
+
+  # rapid case when there is only one site found in sites
+  elif len(sites) == 1:
+    site = sites[0]
+    ask = input(f"{site}?\n [Y,n]: ")
+    if ask in "yYsS":
+      # print site accounts
+      print_all_pw(site, all_info)
+
+  else:
+    # enumerate all sites
+    for i, site in enumerate(sites):
+      print(f"{i+1}. {site}")
+
+    # ask for index
+    selected_idx = int(input("Select site number: ")) - 1
+    site = sites[selected_idx] 
+    # print site accounts
+    print_all_pw(site, all_info)
 
 
 
