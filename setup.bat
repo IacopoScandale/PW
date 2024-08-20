@@ -17,5 +17,4 @@ python post_install.py
 echo Done!
 echo.
 
-echo Setup completed!
 pause

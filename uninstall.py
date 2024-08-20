@@ -1,7 +1,6 @@
 from pw.data.strings import *
 import subprocess
 import os
-import sys
 
 
 def print_path(path: str) -> None:
@@ -61,17 +60,13 @@ def remove_paths_from_PATH(path_to_remove: str) -> None:
   os.system(overwrite_path_command.format(path_content=new_PATH))
 
 
-
-
-if __name__ == "__main__":
+def uninstall() -> None:
   # info
   print(
-    f"NB: file '{os.path.join(PACKAGE_NAME, PW_OBJECTS)}' will be",
-    f"kept and renamed as '{os.path.join(PACKAGE_NAME, OLD_PW_OBJECTS)}'"
-    "\nIn this way pw data will be preserved (but passwords remains",
+    f"\nNB: file '{PW_OBJECTS}' will be kept.\n   ",
+    "In this way pw data will be preserved (but passwords remain",
     "encrypted with your previous PW password!)\n"
   )
-  
   here: str = os.path.dirname(os.path.abspath(__file__))
   os.chdir(here)
 
@@ -87,20 +82,12 @@ if __name__ == "__main__":
   path_to_remove: str = os.path.join(here, COMMANDS_COPY_FOLDER)
   remove_paths_from_PATH(path_to_remove)
 
-
   # delete file `check_pw.txt`
-  check_pw_full_path: str = os.path.join(here, PACKAGE_NAME, CHECK_PW)
-  if os.path.exists(check_pw_full_path):
-    os.remove(check_pw_full_path)
+  if os.path.exists(CHECK_PW):
+    os.remove(CHECK_PW)
 
-  # if exists old_pw_objects exit and do not overwrite it
-  old_pw_obj_full_path: str = os.path.join(here, PACKAGE_NAME, OLD_PW_OBJECTS)
-  if os.path.exists(old_pw_obj_full_path):
-    print(f"ERROR: file {old_pw_obj_full_path} already exists.")
-    print("If you want to uninstall PW move or delete that file")
-    sys.exit()
+  print("Succesfully Uninstalled PW Package")
 
-  # rename file `pw_objects.json` for not loosing data
-  pw_obj_full_path: str = os.path.join(here, PACKAGE_NAME, PW_OBJECTS)
-  if os.path.exists(pw_obj_full_path):
-    os.rename(pw_obj_full_path, old_pw_obj_full_path)
+
+if __name__ == "__main__":
+  uninstall()

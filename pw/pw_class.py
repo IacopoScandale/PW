@@ -7,7 +7,6 @@ import sys
 import json
 
 
-
 class PW (object):
   """
   Creates a PW object representing a single account. 
@@ -16,7 +15,15 @@ class PW (object):
   If encrypted is true then pw is encrypted
 
   """
-  def __init__(self, site:str, username:str, email:str, pw:str, other:list[str], encrypted:bool=False):
+  def __init__(
+    self, 
+    site: str, 
+    username: str, 
+    email: str, 
+    pw: str, 
+    other: list[str], 
+    encrypted: bool = False
+  ):
     self.site = site
     self.username = username
     self.email = email
@@ -45,16 +52,18 @@ class PW (object):
 
   def print_site(self) -> str:
     """
-    Use this function to print only site information with username and email
+    Use this function to print only site information with username 
+    and email
     """
     return f" Sito: {self.site}\n Username: {self.username}\n Email: {self.email}"
  
 
-  def print_site_pw(self, decrypted_pw:str=None) -> str:
+  def print_site_pw(self, decrypted_pw: str | None = None) -> str:
     """
     Use this function to print all information linked to a site
     
-    oss: use `decrypted_pw` equal as decrypted password for current object if known for skipping enter password
+    oss: use `decrypted_pw` equal as decrypted password for current 
+         object if known for skipping enter password
     """
     if decrypted_pw is None:
       decrypted_pw = decrypt_str(self.encrypted_pw)
@@ -83,7 +92,8 @@ class PW (object):
       print("\nCorrectly added pw to the database")
     # if site not in check if value alredy exists
     elif self.site in pw_objects.keys():
-      # cannot use `if value not in pw_objects[self.site]` because same pw is encrypted differently
+      # cannot use `if value not in pw_objects[self.site]` because same
+      # pw is encrypted differently
       # we will use PW object comparison defined without encrypted pw
       value_as_objects = [PW.from_dict(dict_obj) for dict_obj in pw_objects[self.site]]
       if self not in value_as_objects:
@@ -127,7 +137,7 @@ class PW (object):
       json.dump(pw_objects, jsonfile, indent=2)
     
 
-  def change_pw(self, new_pw:str=None) -> None:
+  def change_pw(self, new_pw: str | None = None) -> None:
     """
     Changes pw in self object and in database.
     """
@@ -179,15 +189,10 @@ class PW (object):
     )
 
 
-
-
   # TODO other methods that replicates other files to "alleggerire" code e.g. copy pw from object, 
   # prints all objects, choose which account you want to copy pw, add pw to object 
 
   # TODO functions to add elements to pw_objects.json, encrypt and decrypt pw, print and so on.
-
-
-
 
 
 def create_objects_from_json(site:str) -> list['PW']:
@@ -209,7 +214,7 @@ def create_objects_from_json(site:str) -> list['PW']:
   return value
     
 
-def print_all_pw(site:str, print_pw=False) -> None:
+def print_all_pw(site: str, print_pw: bool = False) -> None:
   """
   Prints all objects linked as values in `pw_objects` from key `site`.
   If `print_pw=True` than prints more data (uses PW.print_site_pw)
@@ -237,7 +242,7 @@ def print_all_pw(site:str, print_pw=False) -> None:
 
 
 
-def get_pw_from_json(site_query:str) -> str:
+def get_pw_from_json(site_query: str) -> str:
   """
   Input:
   · `site_query:str` is a part of the name of a site e.g. 'ith' -> 'github.com'
@@ -261,7 +266,10 @@ def get_pw_from_json(site_query:str) -> str:
     for i, site in enumerate(sites):
       print(f" {i+1}. {site}")
     # ask for index
-    selected_idx = int(input("\nSelect site number: ")) - 1
+    try:
+      selected_idx = int(input("\nSelect site number: ")) - 1
+    except KeyboardInterrupt:
+      sys.exit()
     site = sites[selected_idx]
 
   print(f"\nSite: {site}")
@@ -286,7 +294,7 @@ def get_pw_from_json(site_query:str) -> str:
     return obj.get_pw()
 
 
-def copy_pw_from_json(site_query:str) -> None:
+def copy_pw_from_json(site_query: str) -> None:
   """
   copies pw in the clipboard
   """
@@ -305,7 +313,7 @@ def copy_pw_from_json(site_query:str) -> None:
     print("TODO")
 
 
-def find_full_site_names(site_query:str, show_print:bool=False) -> list[str]:
+def find_full_site_names(site_query: str, show_print: bool = False) -> list[str]:
   """
   Input:
   · `site_query:str` is a part of the name of a site e.g. 'ith' -> 'github.com'
@@ -323,8 +331,8 @@ def find_full_site_names(site_query:str, show_print:bool=False) -> list[str]:
     return [""]
   # print case
   if show_print is True:
-    for i,site in enumerate(sites):
-      print(f"{i+1}. {site}")
+    for i, site in enumerate(sites, 1):
+      print(f"{i:>5}. {site}")
   return sites
 
 
@@ -378,16 +386,17 @@ def print_site_info_command(site_query: str, all_info: bool = False) -> None:
 
   else:
     # enumerate all sites
-    for i, site in enumerate(sites):
-      print(f"{i+1}. {site}")
+    for i, site in enumerate(sites, 1):
+      print(f"{i:>5}. {site}")
 
     # ask for index
-    selected_idx = int(input("Select site number: ")) - 1
+    try:
+      selected_idx = int(input("\nSelect site number: ")) - 1
+    except KeyboardInterrupt:
+      sys.exit()
     site = sites[selected_idx] 
     # print site accounts
     print_all_pw(site, all_info)
-
-
 
 
 

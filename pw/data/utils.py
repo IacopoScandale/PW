@@ -1,4 +1,4 @@
-from .strings import CHECK_PW, COUNTER_JSON_NAME
+from .strings import CHECK_PW, COUNTER_JSON
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -15,15 +15,12 @@ def add_one_to_counter(command_name: str) -> None:
   add +1 usage to the counter. This counter will save
   how many times we use that command
   """
-  here: str = os.path.dirname(os.path.abspath(__file__))
-  full_path_counter_json: str = os.path.join(here, COUNTER_JSON_NAME)
-
   # create file if it does not exists
-  if not os.path.exists(full_path_counter_json):
-    print(f"Error: missing file {full_path_counter_json}")
+  if not os.path.exists(COUNTER_JSON):
+    print(f"Error: missing file {COUNTER_JSON}")
     sys.exit()
 
-  with open(full_path_counter_json, "r") as jsonfile:
+  with open(COUNTER_JSON, "r") as jsonfile:
     # load dictionary
     counter_json: dict[str,int] = json.load(jsonfile)
   # add +1 to the frequency dictionary
@@ -32,7 +29,7 @@ def add_one_to_counter(command_name: str) -> None:
   else:
     counter_json[command_name] += 1
   # save progress
-  with open(full_path_counter_json, "w") as jsonfile:
+  with open(COUNTER_JSON, "w") as jsonfile:
     json.dump(counter_json, jsonfile, indent=2)
 
 

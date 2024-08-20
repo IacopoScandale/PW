@@ -1,5 +1,6 @@
 from pw.data.utils import encrypt_str
 from pw.data.strings import *
+from uninstall import uninstall
 from getpass import getpass
 import subprocess
 import os
@@ -101,25 +102,32 @@ if __name__ == "__main__":
   
   
   # create usage_counter.json file
-  couter_file: str = os.path.join(here, PACKAGE_NAME, COUNTER_JSON)
-  if not os.path.exists(couter_file):
-    with open(couter_file, "w") as jsonfile:
+  if not os.path.exists(COUNTER_JSON):
+    with open(COUNTER_JSON, "w") as jsonfile:
       json.dump(dict(), jsonfile)
 
   # create `pw/data/pw_objects.json` if it does not exists 
   # (otherwise passwords could be lost)
-  pw_obj_full_path: str = os.path.join(here, PACKAGE_NAME, PW_OBJECTS)
-  if not os.path.exists(pw_obj_full_path):
+  if not os.path.exists(PW_OBJECTS):
     # if it does not exist: create pw_objects.json as empty dictionary
-    with open(pw_obj_full_path, "w") as jsonfile:
+    with open(PW_OBJECTS, "w") as jsonfile:
       json.dump(dict(), jsonfile)
   else:
     print(
-      f"Cannot delete '{pw_obj_full_path}' file:"
+      "\nERROR:\n"
+      f"Cannot delete '{PW_OBJECTS}' file:",
       "it could contain some important data."
-      "\nMove or delete it and restart setup"
     )
-    sys.exit()
+    choice: str = input("\nDo you want to delete old data? [y,N]: ")
+    if choice in "nN":
+      print("\nUNINSTALLING PW PACKAGE:\n")
+      uninstall()
+      sys.exit()
+
+    elif choice in "sSyY":
+      with open(PW_OBJECTS, "w") as jsonfile:
+        json.dump(dict(), jsonfile)
+
 
   # enter PW main password and use it for first encription
   print(
@@ -132,6 +140,7 @@ if __name__ == "__main__":
   encrypt_msg = encrypt_str(os.getcwd(), pw, check=False)
 
   # create `pw/data/check_pw.txt` file and write the encrypted message
-  check_pw_full_path: str = os.path.join(here, PACKAGE_NAME, CHECK_PW)
-  with open(check_pw_full_path, "w") as txtfile:
+  with open(CHECK_PW, "w") as txtfile:
     txtfile.write(encrypt_msg)
+
+  print("\nSetup Completed! type pw for more info")

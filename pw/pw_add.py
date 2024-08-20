@@ -2,7 +2,6 @@ from .data.utils import add_one_to_counter
 from .data.strings import PW_ADD_COMM_NAME
 from .pw_class import PW
 from argparse import ArgumentParser, Namespace
-import os
 import sys
 
 
@@ -15,9 +14,6 @@ def get_arguments() -> Namespace:
 
 
 def main() -> None:
-  # change directory otherwise it won't find pw_objects.json
-  os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
   _ = get_arguments()
 
   # ask manually for account info

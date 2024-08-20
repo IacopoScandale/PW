@@ -1,33 +1,30 @@
-# Work in Progress . . .
-
-
-
 # PW
-Terminal account password manager
+
+> package name: *pw*
+
+Terminal site account password manager
 
 
-## Install:
-It will automaticly install a virtual environment with dependencies included in `requirements.txt` file. Then it will create the file with aliases (depending by your os) and they will be always ready to use in your terminal.
+# Download
+Recommended install is by executing install files respectively .bat for windows and ??? for linux. 
 
-### Windows
-Double click on `setup.bat` file and give administration permissions, otherwise open terminal **as administrator!** and execute `setup.py` file.
+This will install this package and dependencies in a virtual environment. Then all commands will be put in Commands folder that will automaticly added to path variable. In this way commands will always loaded on terminal. All this is done in the scrypt `post_install.py`. 
 
-> oss: administrator powers are needed for accessing to regedit. In this way commands will be always loaded on terminal
+## Windows
+Just double click on `setup.bat` file. If you want to uninstall just double click on `uninstall.bat` file. Easy peasy.
 
-### Linux
-
-
-
+## Linux
+work in progress
 
 
-
-
-## Commands:
-* `pw`: prints PW project info
-* `pw.add`: adds pw to database
-* `pw.info`: gets few info on pw
-* `pw.all_info`: gets all pw info
-* `pw.copy`: copies pw to the clipboard
+# Commands:
+|command|description|
+|-|-|
+|`pw`|prints PW project info and command names|
+|`pw.add`|adds pw to database|
+|`pw.info`|gets few info on pw|
+|`pw.all_info`|gets all pw info (requires PW password)|
+|`pw.copy`|copies pw to the clipboard|
  
 
 Type `command_name -h` or `command_name --help` for more info
