@@ -14,7 +14,9 @@ This will install this package and dependencies in a virtual environment. Then a
 Just double click on `setup.bat` file. If you want to uninstall just double click on `uninstall.bat` file. Easy peasy.
 
 ## Linux
-work in progress
+Navigate into main project folder and execute this command: `./setup.sh` for installing pw commands. sudo powers are required for installation.
+
+For undo installation just run `./uninstall.sh`. Then you can simply remove the folder. NB: passwords would not be removed, but they will remain encrypted with the old PW password.
 
 
 # Commands:

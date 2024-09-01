@@ -19,6 +19,9 @@ VENV_FOLDER: str = "venv"
 venv folder name
 """
 
+BIN_PATH_LINUX: str = "/usr/local/bin/"
+
+
 VENV_SCRIPTS_FOLDER_WIN: str = os.path.join(VENV_FOLDER, "Scripts")
 VENV_SCRIPTS_FOLDER_LINUX: str = os.path.join(VENV_FOLDER, "bin")
 
