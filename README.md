@@ -18,6 +18,8 @@ Navigate into main project folder and execute this command: `./setup.sh` for ins
 
 For undo installation just run `./uninstall.sh`. Then you can simply remove the folder. NB: passwords would not be removed, but they will remain encrypted with the old PW password.
 
+oss: `xclip` is required for copying passwords into the clipboard.
+
 
 # Commands:
 |command|description|

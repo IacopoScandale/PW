@@ -309,8 +309,8 @@ def copy_pw_from_json(site_query: str) -> None:
     os.system(f'echo {pw}| clip')
     print("\nPassword copied to clipboard")
   elif os.name == "posix":
-    # TODO 
-    print("TODO")
+    os.system(f"echo -n {pw}| xclip -selection clipboard")
+    print("\nPassword copied to clipboard")    
 
 
 def find_full_site_names(site_query: str, show_print: bool = False) -> list[str]:
