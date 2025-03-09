@@ -59,6 +59,7 @@ def ask_for_pw_two_times() -> str:
       return pw
     else:
       print("Error: passwords do not match. Try again\n")
+      return ask_for_pw_two_times()
 
 
 if __name__ == "__main__":
