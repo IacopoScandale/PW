@@ -184,16 +184,19 @@ class PW (object):
 
     for dic in pw_objects[self.site]:
       if dic["site"] == self.site and dic["username"] == self.username and dic["email"] == self.email:
-        if new_site:
+        if new_site and not new_site == self.site:
+          print(f"\nChanged site name from '{self.site}' to '{new_site}'")
           # without changing anything to self, get self position in 
           # pw_objects[self.site] list to then change key
           site_objects: list[dict] = pw_objects[self.site]
-          pw_object_pos: int = site_objects.index(self.__dict__)
+          pw_object_pos: int = site_objects.index(dic)
           dic["site"] = new_site
         if new_email:
+          print(f"\nChanged email from '{self.email}' to '{new_email}'")
           self.email = new_email
           dic["email"] = new_email
         if new_username:
+          print(f"\nChanged username from '{self.username}' to '{new_username}'")
           self.username = new_username
           dic["username"] = new_username
         if change_pw:
@@ -238,7 +241,7 @@ class PW (object):
         dic["edit_date"] = edit_date
 
         # also change pw_object key (cfr PW_OBJECTS)
-        if new_site:
+        if new_site and not new_site == self.site:
           if new_site not in pw_objects:
             pw_objects[new_site] = []
 
@@ -257,8 +260,9 @@ class PW (object):
     # write changes
     with open(PW_OBJECTS, "w") as jsonfile:
       json.dump(pw_objects, jsonfile, indent=2)
-        
-    return
+
+    print("\nChanges done:")
+    print(self.print_site())
 
 
   @classmethod
