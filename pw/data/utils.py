@@ -7,6 +7,7 @@ from getpass import getpass
 import os
 import sys
 import json
+from datetime import datetime
 
 
 def add_one_to_counter(command_name: str) -> None:
@@ -93,19 +94,24 @@ def encrypt_str_list(decrypted_msg:list[str], pw:str|None=None, check:bool=True)
   """
   # ask user for password if pw is None
   if pw is None:
-    pw = getpass(prompt="\nEnter PW password: ")
-  # check if pw is correct
-  if check is True:
-    if check_pw(pw) is False:
-      raise ValueError("wrong password")
+    while True:
+      try:
+        pw: str = getpass(prompt="\nEnter PW password: ")
+      except KeyboardInterrupt:
+        sys.exit()
+      if check_pw(pw):
+        break
+      else:
+        print("Wrong password, try again (^C to stop)")
+  
   # try to return encrypted_msg
-  try:
-    key = generate_fernet_key(pw)
-    return [Fernet(key).encrypt(msg.encode()).decode() for msg in decrypted_msg]
+  # try:
+  key = generate_fernet_key(pw)
+  return [Fernet(key).encrypt(msg.encode()).decode() for msg in decrypted_msg]
     # encrypted_msg = Fernet(key).encrypt(decrypted_msg.encode()).decode()
     # return encrypted_msg
-  except:
-    raise ValueError("Error: wrong password")
+  # except:
+  #   raise ValueError("Error: wrong password")
 
 
 def encrypt_str(decrypted_msg:str, pw:str=None, check:bool=True) -> str:
@@ -115,7 +121,7 @@ def encrypt_str(decrypted_msg:str, pw:str=None, check:bool=True) -> str:
   return encrypt_str_list([decrypted_msg], pw, check)[0]
 
 
-def check_pw(pw:str) -> bool:
+def check_pw(pw: str) -> bool:
   """
   Use this function to check if a password pw is correct.
   Pw is correct when it can decode `check_pw.txt` encrypted
@@ -131,4 +137,24 @@ def check_pw(pw:str) -> bool:
     decrypt_str(encrypted_msg, pw)
     return True
   except:
-    return False  
+    return False
+  
+
+def get_edit_date() -> str:
+  now: datetime = datetime.now()
+  date: str = now.strftime("%Y-%m-%d %H:%M")
+  return date
+
+
+def ask_for_pw_two_times(label: str = "Create PW password: ") -> str:
+  try:
+    pw: str = getpass(label)
+    pw_check: str = getpass("Confirm password: ")
+  except KeyboardInterrupt:
+    sys.exit()
+
+  if pw == pw_check:
+    return pw
+  else:
+    print("Error: passwords do not match. Try again\n")
+    return ask_for_pw_two_times()

@@ -7,3 +7,9 @@ pw/data/OLD_pw_objects.json
 pw/data/check_pw.txt
 pw/data/usage_counter.json
 pw/data/pw.csv
+post_install.py
+setup.sh
+setup.bat
+uninstall.bat
+uninstall.py
+uninstall.sh

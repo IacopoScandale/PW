@@ -1,43 +1,69 @@
 import os
 
+# strings
+PACKAGE_NAME = "pw"
+MAIN_COMM_NAME = "pw"
+AUTHOR = "Iacopo Scandale"
+LICENSE = "GNU"
+VERSION = "2.0"
+DESCRIPTION = (
+  "CLI Password Manager.\n"
+  f"Type '{MAIN_COMM_NAME}' for some infos,\n"
+  f"Type '{MAIN_COMM_NAME} -h' for other infos"
+)
 
-PACKAGE_NAME: str = "pw"
-DATA_FOLDER: str = os.path.dirname(os.path.abspath(__file__))
+
+# commands
+COMMANDS: list[str] = [
+  PW_ADD_COMM_NAME := "add",
+  PW_INFO_COMM_NAME := "info",
+  PW_ALL_INFO_COMM_NAME := "all_info",
+  PW_COPY_COMM_NAME := "copy",
+  PW_LIST_COMM_NAME := "list",
+  PW_EDIT_COMM_NAME := "edit",
+  PW_REMOVE_COMM_NAME := "remove",
+]
+
+# command help messages
+PW_ADD_HELP = "Add a site account to the database."
+PW_INFO_HELP = "Show some infos linked to chosen site found from site query"
+PW_ALL_INFO_HELP = (
+  "Prints all infos linked to chosen site found from site query "
+  "requires PW password"
+)
+PW_COPY_HELP = (
+  "Copy the password associated with the selected account to the clipboard"
+)
+PW_LIST_HELP = (
+  "List all sites in the database. Also a query can be passed to filter the list"
+)
+PW_EDIT_HELP = "Find an account from a site query and edit infos"
+PW_REMOVE_HELP = "Find an account from a site query and remove it"
+
+
+DATA_FOLDER = os.path.dirname(os.path.abspath(__file__))
 """
 Full path `pw/data` folder
 """
-COMMANDS_COPY_FOLDER: str = "Commands"
-"""
-Commands folder name
-"""
-INFO_FOLDER: str = f"{PACKAGE_NAME}.egg-info"
+
+INFO_FOLDER = f"{PACKAGE_NAME}.egg-info"
 """
 Egg info folder name
 """
-VENV_FOLDER: str = "venv"
-"""
-venv folder name
-"""
 
-BIN_PATH_LINUX: str = "/usr/local/bin/"
-
-
-VENV_SCRIPTS_FOLDER_WIN: str = os.path.join(VENV_FOLDER, "Scripts")
-VENV_SCRIPTS_FOLDER_LINUX: str = os.path.join(VENV_FOLDER, "bin")
-
-COUNTER_JSON: str = os.path.join(DATA_FOLDER, "usage_counter.json")
+COUNTER_JSON = os.path.join(DATA_FOLDER, "usage_counter.json")
 """
 Full path `pw/data/usage_counter.json`
 """
-PW_OBJECTS: str = os.path.join(DATA_FOLDER, "pw_objects.json")
+PW_OBJECTS = os.path.join(DATA_FOLDER, "pw_objects.json")
 """
 Full path of the file `pw/data/pw_objects.json`
 """
-PW_CSV: str = os.path.join(DATA_FOLDER, "pw.csv")
+PW_CSV = os.path.join(DATA_FOLDER, "pw.csv")
 """
 Full path of file `pw/data/pw.csv`
 """
-CHECK_PW: str = os.path.join(DATA_FOLDER, "check_pw.txt")
+CHECK_PW = os.path.join(DATA_FOLDER, "check_pw.txt")
 """
 Full path of the .txt file containing an encrypted string. 
 
@@ -45,17 +71,3 @@ Use it to check if password is correct: if used password cannot
 decode this string then it is wrong. This is useful when we add
 new passwords. 
 """
-
-# commands
-PW_ADD_COMM_NAME: str = "pw.add"
-PW_INFO_COMM_NAME: str = "pw.info"
-PW_ALL_INFO_COMM_NAME: str = "pw.all_info"
-PW_COPY_SITE_PW: str = "pw.copy"
-
-COMMANDS: dict[str,str] = {
-  PACKAGE_NAME: "pw_help",
-  PW_ADD_COMM_NAME: "pw_add",
-  PW_INFO_COMM_NAME: "pw_site_info",
-  PW_ALL_INFO_COMM_NAME: "pw_site_all_info",
-  PW_COPY_SITE_PW: "pw_copy",
-}

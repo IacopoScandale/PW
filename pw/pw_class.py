@@ -1,10 +1,14 @@
-from .data.utils import encrypt_str, decrypt_str, decrypt_str_list, generate_fernet_key
+from .data.utils import (
+  encrypt_str, decrypt_str, decrypt_str_list, generate_fernet_key, 
+  get_edit_date, ask_for_pw_two_times
+)
 from .data.strings import PW_OBJECTS, PW_CSV
-from cryptography.fernet import Fernet
-from getpass import getpass
 import os
 import sys
 import json
+from typing import Any
+# from getpass import getpass
+from cryptography.fernet import Fernet
 
 
 class PW (object):
@@ -22,7 +26,8 @@ class PW (object):
     email: str, 
     pw: str, 
     other: list[str], 
-    encrypted: bool = False
+    encrypted: bool = False,
+    edit_date: str | None = None,
   ):
     self.site = site
     self.username = username
@@ -32,11 +37,13 @@ class PW (object):
     elif encrypted is True:
       self.encrypted_pw = pw
     self.other = other
+    self.edit_date = edit_date
 
 
   def __eq__(self, other):
     """
-    def: two PW objects are equal if "site", "username", "email" fields are equal
+    def: two PW objects are equal if "site", "username", "email" fields 
+    are equal
     """
     self_dict = self.__dict__
     other_dict = other.__dict__
@@ -55,8 +62,13 @@ class PW (object):
     Use this function to print only site information with username 
     and email
     """
-    return f" Sito: {self.site}\n Username: {self.username}\n Email: {self.email}"
- 
+    return (
+      f"· Site:      {self.site}\n" 
+      f"  Username:  {self.username}\n" 
+      f"  Email:     {self.email}\n"
+      f"  Last Edit: {self.edit_date}\n"
+    )
+
 
   def print_site_pw(self, decrypted_pw: str | None = None) -> str:
     """
@@ -67,10 +79,17 @@ class PW (object):
     """
     if decrypted_pw is None:
       decrypted_pw = decrypt_str(self.encrypted_pw)
-    res = f" Sito: {self.site}\n Username: {self.username}\n Email: {self.email}\n Password: {decrypted_pw}\n Other:"
+    res: str = (
+      f"· Site:      {self.site}\n" 
+      f"  Username:  {self.username}\n" 
+      f"  Email:     {self.email}\n" 
+      f"  Last Edit: {self.edit_date}\n"
+      f"  Password:  {decrypted_pw}\n" 
+       "  Other:"
+    )
     # format 'other' section
     for el in self.other:
-        res = res + f"\n  · {el}"
+        res = res + f"\n    · {el}"
     return res
 
 
@@ -82,8 +101,8 @@ class PW (object):
     with open(PW_OBJECTS,"r") as jsonfile:
       pw_objects = json.load(jsonfile)
 
-    # convert the object into a dictionary and 
-    # add it to the list of values of `pw_objects`
+    # convert the object into a dictionary and add it to the list of 
+    # values of `pw_objects`
     value = self.__dict__
 
     # if site in the database
@@ -118,63 +137,132 @@ class PW (object):
 
     # case site not in database
     if self.site not in pw_objects.keys():
-      raise KeyError(f"Site {self.site} not in database")
-    
+      print(f"Site {self.site} not in database")
+      sys.exit()
+
     value = self.__dict__
     # remove object if found
     if value in pw_objects[self.site]:
-      pw_objects[self.site].remove(value)
-      print("Correctly removed object from database")
-      # if it was last pw then del the site
-      if pw_objects[self.site] == []:
-        del(pw_objects[self.site])
-        print("Correctly removed site from database because there was not any pw linked to it")
+      print(self.print_site())
+      try:
+        ask: str = input(f"Do you want to remove it?\n  [Y,n]: ")
+      except KeyboardInterrupt:
+        sys.exit()
+      if ask in "yY":
+        pw_objects[self.site].remove(value)
+        print("Correctly removed object from database")
+        # if it was last pw then del the site key
+        if pw_objects[self.site] == []:
+          del(pw_objects[self.site])
     else:
       print("Could not remove object from database because it does not exist")
 
     # save changes
     with open(PW_OBJECTS, "w") as jsonfile:
       json.dump(pw_objects, jsonfile, indent=2)
+
+ 
+  def edit(
+    self,
+    new_site: str | None = None, 
+    new_email: str | None = None, 
+    new_username: str | None = None,
+    change_pw: bool = False,
+    edit_other: bool = False,
+  ) -> None:
+    ...
+    """
+    Lets the user edit specific fields of pw object and refreshes edit 
+    date
+    """
+    # base case: exit if there is nothing to edit
+    if not any([new_site, new_email, new_username, change_pw, edit_other]):
+      return
     
-
-  def change_pw(self, new_pw: str | None = None) -> None:
-    """
-    Changes pw in self object and in database.
-    """
-    # Insert new password
-    if new_pw is None:
-      new_pw = getpass(prompt="Insert new password: ")
-      new_pw_confirm = getpass(prompt="Confirm password: ")
-      if new_pw != new_pw_confirm:
-        raise ValueError("Error: passwords does not match")
-    # encrypt new pw
-    new_encrypt_str = encrypt_str(new_pw)
-    # change pw in self object
-    self.encrypted_pw = new_encrypt_str
-    print("Password correctly changed in PW object")
-    # change pw if self object in database
     with open(PW_OBJECTS,"r") as jsonfile:
-      pw_objects = json.load(jsonfile)
-    # base case
-    if self.site not in pw_objects.keys():
-      raise KeyError(f"Error: site {self.site} not in dataase")
+      pw_objects: dict = json.load(jsonfile)
 
-    dict_list = pw_objects[self.site]
-    for dic in dict_list:
+    for dic in pw_objects[self.site]:
       if dic["site"] == self.site and dic["username"] == self.username and dic["email"] == self.email:
-        dic["encrypted_pw"] = new_encrypt_str
-        print("Password changed correctly in database")
-        # save changes
-        with open(PW_OBJECTS, "w") as jsonfile:
-          json.dump(pw_objects, jsonfile, indent=2)
-        return
-    print("Cannot change password in database because object not in database")
+        if new_site:
+          # without changing anything to self, get self position in 
+          # pw_objects[self.site] list to then change key
+          site_objects: list[dict] = pw_objects[self.site]
+          pw_object_pos: int = site_objects.index(self.__dict__)
+          dic["site"] = new_site
+        if new_email:
+          self.email = new_email
+          dic["email"] = new_email
+        if new_username:
+          self.username = new_username
+          dic["username"] = new_username
+        if change_pw:
+          new_pw: str = ask_for_pw_two_times("Enter new password: ")
+          new_encrypted_pw = encrypt_str(new_pw)
+          self.encrypted_pw = new_encrypted_pw
+          dic["encrypted_pw"] = new_encrypted_pw
+
+        if edit_other:
+          print("\nEdit other:")
+          # edit existing other
+          new_other: list[str] = []
+          for i, other in enumerate(dic["other"], 1):
+            if i==1:
+              print("Choices are\n- 'k': keep\n- 'd': delete\n- 'e': edit\n")
+            print(f"\n{i:>3}. '{other}'")
+            try:
+              cur_choice: str = input("      [K,d,e]: ")
+            except KeyboardInterrupt:
+              sys.exit()
+            
+            edited_other: str = edit_recursive_choices(cur_choice, other)
+            if edited_other:
+              new_other.append(edited_other)
+          # add new other
+          print("\nEnter additional infos:")
+          print("(leave blank to stop)")
+          while True:
+            try:
+              info: str = input(" · ")
+            except KeyboardInterrupt:
+              sys.exit()
+            if not info.strip():
+              break
+            else:
+              new_other.append(info.strip())
+
+          dic["other"] = new_other
+          self.other = new_other
+
+        edit_date: str = get_edit_date()
+        dic["edit_date"] = edit_date
+
+        # also change pw_object key (cfr PW_OBJECTS)
+        if new_site:
+          if new_site not in pw_objects:
+            pw_objects[new_site] = []
+
+          # if only one element (i.e. self) then remove site key from PW_OBJECTS
+          if len(site_objects) == 1:
+            pw_objects.pop(self.site)
+          else:
+            # remove self from old site key
+            pw_objects[self.site].pop(pw_object_pos)
+
+          self.site = new_site 
+          self.edit_date = edit_date
+          pw_objects[new_site].append(self.__dict__)
 
 
+    # write changes
+    with open(PW_OBJECTS, "w") as jsonfile:
+      json.dump(pw_objects, jsonfile, indent=2)
+        
+    return
 
 
   @classmethod
-  def from_dict(cls, data:dict[str,any]) -> 'PW':
+  def from_dict(cls, data: dict[str, Any]) -> 'PW':
     """
     Converts dictionary (well formatted or created with PW.__dict__())
     into a PW object
@@ -185,17 +273,14 @@ class PW (object):
       email = data['email'],
       pw = data['encrypted_pw'],
       other = data['other'],
-      encrypted = True
+      encrypted = True,
+      edit_date = data.get("edit_date", None)
     )
 
+# TODO or maybe not, some of the following functions are redundant. Some
+# of them could be rewritten using `get_pw_obj_from_site_query`
 
-  # TODO other methods that replicates other files to "alleggerire" code e.g. copy pw from object, 
-  # prints all objects, choose which account you want to copy pw, add pw to object 
-
-  # TODO functions to add elements to pw_objects.json, encrypt and decrypt pw, print and so on.
-
-
-def create_objects_from_json(site:str) -> list['PW']:
+def create_objects_from_json(site: str) -> list['PW']:
   """
   Returns the list of objects that are values of key site in pw_objects.json
   """
@@ -241,7 +326,6 @@ def print_all_pw(site: str, print_pw: bool = False) -> None:
       print(pw_object.print_site() + "\n")
 
 
-
 def get_pw_from_json(site_query: str) -> str:
   """
   Input:
@@ -253,7 +337,8 @@ def get_pw_from_json(site_query: str) -> str:
   sites = find_full_site_names(site_query)
   # base case: no sites found
   if sites == [""]:
-    raise ValueError("No sites found")
+    print(f"No sites found containing query: '{site_query}'")
+    sys.exit()
   # rapid case: only one site found
   if len(sites) == 1:
     site = sites[0]
@@ -278,8 +363,6 @@ def get_pw_from_json(site_query: str) -> str:
   # rapid case: a single pw linked to site
   if len(obj_list) == 1:
     obj = obj_list[0]
-    print(obj.print_site())
-    return obj_list[0].get_pw()
   # case with more accounts
   else:
     usernames = [obj.username for obj in obj_list]
@@ -288,10 +371,14 @@ def get_pw_from_json(site_query: str) -> str:
     for i, (username, email) in enumerate(zip(usernames, emails)):
       print(f" {i+1}. username: {username}, email: {email}")
     # select account
-    selected_index = int(input("\nSelect an account number: ")) - 1
+    try:
+      selected_index = int(input("\nSelect an account number: ")) - 1
+    except KeyboardInterrupt:
+      sys.exit()
     obj = obj_list[selected_index]
-    print(obj.print_site())
-    return obj.get_pw()
+
+  print(obj.print_site())
+  return obj.get_pw()
 
 
 def copy_pw_from_json(site_query: str) -> None:
@@ -306,10 +393,10 @@ def copy_pw_from_json(site_query: str) -> None:
     return
   
   if os.name == "nt":
-    os.system(f'echo {pw}| clip')
+    os.system(f'echo "{pw}"| clip')
     print("\nPassword copied to clipboard")
   elif os.name == "posix":
-    os.system(f"echo -n {pw}| xclip -selection clipboard")
+    os.system(f'echo -n "{pw}"| xclip -selection clipboard')
     print("\nPassword copied to clipboard")    
 
 
@@ -336,6 +423,7 @@ def find_full_site_names(site_query: str, show_print: bool = False) -> list[str]
   return sites
 
 
+# TODO NotImplemented
 def create_csv_pw_file() -> None:
   """
   Create a csv file with all passwords
@@ -399,7 +487,73 @@ def print_site_info_command(site_query: str, all_info: bool = False) -> None:
     print_all_pw(site, all_info)
 
 
+def get_pw_obj_from_site_query(site_query: str) -> PW:
+  """
+  New approach:
+  TODO change older functions to use this one: first get the object, 
+  then apply methods to it
+  """
+  sites = find_full_site_names(site_query)
+  # base case: no sites found
+  if sites == [""]:
+    print(f"No sites found containing query: '{site_query}'")
+    sys.exit()
+  # rapid case: only one site found
+  if len(sites) == 1:
+    site = sites[0]
+  # rapid case: site query is a full site name
+  elif site_query in sites:
+    site = site_query
+  # general case: more than one site
+  else:
+    # enumerate sites and choose one
+    for i, site in enumerate(sites):
+      print(f" {i+1}. {site}")
+    # ask for index
+    try:
+      selected_idx = int(input("\nSelect site number: ")) - 1
+    except KeyboardInterrupt:
+      sys.exit()
+    site = sites[selected_idx]
 
+  print(f"\nSite: {site}")
+  # create pw obj list from chosen site
+  obj_list = create_objects_from_json(site)
+  # rapid case: a single pw linked to site
+  if len(obj_list) == 1:
+    pw_obj = obj_list[0]
+  # case with more accounts
+  else:
+    usernames = [obj.username for obj in obj_list]
+    emails = [obj.email for obj in obj_list]
+    # print choiches
+    for i, (username, email) in enumerate(zip(usernames, emails)):
+      print(f" {i+1}. username: {username}, email: {email}")
+    # select account
+    try:
+      selected_index = int(input("\nSelect an account number: ")) - 1
+    except KeyboardInterrupt:
+      sys.exit()
+    pw_obj = obj_list[selected_index]
+
+  return pw_obj
+
+
+def edit_recursive_choices(choice: str, other: str) -> str:
+  """
+  cfr pw_class edit method
+  """
+  if choice in "Kk":
+    return other
+  elif choice in "dD":
+    return ""
+  elif choice in "eE":
+    try:
+      return input("Edit other: ")
+    except KeyboardInterrupt:
+      sys.exit()
+  else:
+    return edit_recursive_choices(choice, other)
 
 
 if __name__ == "__main__":
