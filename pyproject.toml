@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pw"
+version = "2025.07.06"
+description = "CLI Password Manager"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Iacopo Scandale", email = "iacopo.scandale.is@gmail.com" }]
+license = { file = "LICENSE" }
+dependencies = [
+    "cryptography>=45.0.5",
+    "pyperclip>=1.9.0",
+    "rich>=14.0.0",
+]
+
+[project.scripts]
+pw = "pw.cli:main"
+
+[dependency-groups]
+dev = [
+    "pw",
+]
+
+[tool.uv.sources]
+pw = { workspace = true }

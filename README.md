@@ -1,170 +1,223 @@
-# PW - CLI Password Manager
+# PW
+## CLI Password Manager
 
-Command-line password manager to securely store, copy and manage site accounts passwords.
+<!-- Badges -->
+![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0) ![Platform](https://img.shields.io/badge/platform-Linux,%20Windows,%20macOS-green) [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+
+
+**pw** is a command-line tool to securely store, copy and manage site account passwords.
+
 
 ## Table of Contents
-- [Installation (Pip)](#pip-installation)
-  - [Virtual env installation](#virtual-env-installation)
-- [Uninstall](#uninstall)
-- [Usage](#usage)
-  - [Available Commands](#available-commands)
-  - [Usage Examples](#usage-examples)
-    - [Display some infos](#1-display-some-infos)
-    - [Add a new account](#add-a-new-account)
-    - [Retrieve information about a site](#retrieve-information-about-a-site)
-    - [View all information about a site (requires password)](#view-all-information-about-a-site-requires-password)
-    - [Copy an account password to the clipboard](#copy-an-account-password-to-the-clipboard)
-    - [List all saved sites](#list-all-saved-sites)
-    - [Edit an account](#edit-an-account)
-    - [Remove an account](#remove-an-account)
+- [Commands](#commands)
+- [Examples](#examples)
+  - [Add](#add)
+  - [Info](#info)
+  - [All Info](#all-info)
+  - [Copy](#copy)
+  - [List](#list)
+  - [Edit](#edit)
+  - [Remove](#remove)
+- [Download](#download)
+  - [Base Env (Easier)](#base-env-easier)
+  - [Virtual Env (Recommended)](#virtual-env-recommended)
+    - [Dependencies](#1-dependencies)
+      - [uv](#uv)
+      - [pip](#pip)
+    - [pw bin file](#2-pw-bin-file)
+      - [Linux and macOS](#linux-and-macos)
+      - [Windows](#windows)
 - [Security Notes](#security-notes)
-- [License](#license)
-- [TODO](#todo)
 
 
-## Pip Installation
-
-Installation is through pip and it is cross-platform for Linux and Windows.
-
-Since it only requires `cryptography==42.0.5` the easiest way is install in global pip environment: download the project, open a terminal, move into the main folder and use the following command:
-```sh
-pip install .
-```
-or for editable mode:
-```sh
-pip install -e .
-```
-Make sure python env is on path so you can use `pw` command in every shell
-
-### Virtual env installation
-If you do not want to install in the base pip env you can create a virtual environment e.g. with venv: always in the main project folder run:
-```sh
-python -m venv venv
-
-# linux
-source venv/bin/activate
-# windows
-venv\Scripts\activate
-
-pip install .  # -e for editable mode
-```
-Then if you want those commands in every shell put on path only the pw command inside the scripts folder in venv. Do not put the whole folder on path because it also contains other scripts like python or pip that will overwrite the default ones.
-
-You can copy pw scripts file somewhere else in another folder on path (e.g. /usr/local/bin for linux)
-
-> For Linux: `xclip` is required for copying passwords into the clipboard.
-
-## Uninstall
-Since it is a pip managed python package just use the following: (as installation, navigate into therminal at the main progect folder)
-
-```sh
-pip uninstall .
-```
-
-If you did some other things to install for example virtual evironments or other, just undo them.
-
-
-## Usage
-
-The basic command to run PW2 is:
+# Commands
+Command template:
 
 ```sh
 pw [command] [options]
 ```
-
-You can use the command without anything to show a 
-
-You can type the following to get help
-```sh
-pw -h
-```
-
-### Available Commands
-
-| [command]      | Description |
-|-------------|------------|
-| `add`       | Adds a new account to the database. |
-| `info`      | Shows information related to a specific account (search by site). |
-| `all_info`  | Prints all information related to a specific account (requires PW password). |
-| `copy`      | Copies the password of the selected account to the clipboard. |
-| `list`      | Lists all sites stored in the database (supports filtering by site query). |
-| `edit`      | Finds an account by site query and allows you to edit its information. |
-| `remove`    | Finds an account by site query and removes it. |
-
-### Usage Examples
-
-#### 1. Display some infos
-You can use the package name without any parameter to show the following infos:
+To show command usages:
 ```sh
 pw
 
-commands:               times used:
+Commands:              Times Used:
 ——————————————————————————————————————
-   1. add                        6
-   2. info                       1
-   3. all_info                  11
-   4. copy                       5
-   5. list                      12
-   6. edit                      18
-   7. remove                     3
+   1. pw                        41
+   2. add                       34
+   3. info                       5
+   4. all_info                  27
+   5. copy                      32
+   6. list                      65
+   7. edit                      44
+   8. remove                     8
 ——————————————————————————————————————
-      Total:                    56
+      Total:                   256
 ```
 
-#### Add a new account
+| [command]      | Description |
+|-------------|------------|
+| `add`       | Add a new account to the database |
+| `info`      | Show information related to a specific account (search by site query) |
+| `all_info`  | Print all information related to a specific account (requires PW password) |
+| `copy`      | Copy the password of the selected account to the clipboard |
+| `list`      | List all sites stored in the database (supports filtering by site query) |
+| `edit`      | Find an account by site query and edit it |
+| `remove`    | Find an account by site query and remove it |
+
+## Examples
+
+#### Add
+Add a new account to the database
 ```sh
 pw add
 ```
-The program will prompt you to enter the account details.
 
-#### Retrieve information about a site
-If we know that github.com is on our pw local database, we can use
+### Info
+Show information related to a specific account (search by site query)
 ```sh
-pw info git 
-```
-And all github accounts will we printed (without password of course). 
-
-#### View all information about a site (requires password)
-If you want to print all information, password included you need to use:
-```sh
-pw all_info git
-```
-That requires PW main password
-
-#### Copy an account password to the clipboard
-```sh
-pw copy git
+pw info git  # git -> github.com
 ```
 
-#### List all saved sites
+
+### All Info
+Print all information related to a specific account (requires PW password)
+```sh
+pw all_info ithub  # ithub -> github.com
+```
+
+### Copy
+Copy the password of the selected account to the clipboard
+```sh
+pw copy hub
+```
+
+### List
+List all sites stored in the database (supports filtering by site query)
+
 ```sh
 pw list
-```
 
-#### Edit an account
-For example let's change the github email for a selected account (you can store all'your different github accounts of course and then choose the one to edit) and site password
+  1. github.com
+  2. example.it
+  3. example.com
+```
 ```sh
-pw edit "hub" --email new@mail --change-pw
+pw list exa
+
+  1. example.it
+  2. example.com
 ```
-You can see all other options with `pw edit -h`
-#### Remove an account
 ```sh
-pw remove github.com
+pw list --raw
+
+github.com
+example.it
+example.com
+```
+
+### Edit
+Find an account by site query and edit it
+```sh
+# edit email and password
+pw edit git --email new@mail --change-pw
+
+# edit everything (site, mail, username, password and other section)
+pw edit git -s new_site -e new_mail -u new_username -p -o
 ```
 
 
-## Security Notes
+### Remove
+Find an account by site query and remove it
+```sh
+pw remove example.com
+```
+
+
+
+# Download
+There are two different ways, choose one:
+- [Base Env (Easier)](#base-env-easier)
+- [Virtual Env (Recommended)](#virtual-env-recommended)
+
+## Base Env (Easier)
+You can install this package (if compatible with python version and other dependencies) in your main python installation with pip. Just open a shell in the main project and type:
+```sh
+pip install -e .  # -e for editable mode
+```
+Uninstall:
+```sh
+pip uninstall .
+```
+
+## Virtual Env (Recommended)
+
+### 1. Dependencies
+#### [uv](https://github.com/astral-sh/uv)
+```sh
+uv sync
+```
+or
+```sh
+# create virtual env
+uv venv
+
+# activate env
+source .venv/bin/activate  # linux or mac
+.venv\Scripts\activate  # windows
+
+# install requirements
+uv pip install -e .  # -e for editable mode
+```
+#### pip
+```sh
+# create virtual env
+python -m venv .venv
+
+# activate env
+source .venv/bin/activate  # linux or mac
+.venv\Scripts\activate  # windows
+
+# install requirements
+pip install -e .  # -e for editable mode
+```
+
+### 2. pw bin file
+Once step 1. is done, the following bin file (the actual terminal command) will be created:
+```sh
+.venv/bin/pw  # linux or mac
+.venv\Scripts\pw.exe  # windows
+```
+To have it ready-to-use in every shell you should have to copy it and paste in a directory on `PATH`. The following directories are suggested, depending on your os:
+
+#### Linux and macOS
+```sh
+# current user
+cp .venv/bin/pw ~/.local/bin/
+
+# or system wide:
+sudo cp .venv/bin/pw /usr/local/bin/
+```
+
+#### Windows
+An advice is to create the linux-equivalent: `"%USERPROFILE%\.local\bin"` directory and then add it on user `PATH`.
+```sh
+# for current user:
+
+# create folder
+mkdir "%USERPROFILE%\.local\bin"
+
+# add it to user path
+# do it through windows settings to avoid problems...
+
+# copy the .exe file into it
+copy .venv\Scripts\ffpdf.exe "%USERPROFILE%\.local\bin\"
+```
+Otherwise you can copy the .exe file into some other folders that are already on `PATH`, as for example `"%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\"`.
+
+
+# Security Notes
 - All site data is stored on a json file that contains all pw accounts
 - Password are encrypted and the key is not written anywhere:
 - the key is generated from the main PW password
 - of course if you know the main PW password or the key, you can access to all the other stored passwords
 - "other" field is meant for other kind of private data on a site account, and it can be accessed onlt throught main PW password. However strings are not yet encrypted in the json document, so for now is not safe to save other passwords or private codes on that field
-
-## License
-This project is released under the GNU General Public License.
-
-
-## TODO
-- [ ] pw change_password (cfr change_pw_comm.py)
-- [ ] also encrypt all "other" section
-- [ ] if the user wants to move to another password manager then he needs a file where all is saved and legible, maybe a csv or yaml file with all decrypted infos (some functions for csv are already implemented)
