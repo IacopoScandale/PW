@@ -26,7 +26,7 @@ def add_comm() -> None:
 
     other: list[str] = []
     print("  \nEnter other private infos:")
-    print("  [black](leave blank to stop)[/black]")
+    print("  [bright_black](leave blank to stop)[/bright_black]")
 
     while True:
         try:

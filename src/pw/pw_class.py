@@ -227,7 +227,7 @@ class PW(object):
                     for i, other in enumerate(dic["other"], 1):
                         if i == 1:
                             print(
-                                "Choices are\n· [green]k[/green] — [black]keep item[/black]\n· [red]d[/red] — [black]delete item[/black]\n· [yellow]e[/yellow] — [black]edit item[/black]"
+                                "Choices are\n· [green]k[/green] — [bright_black]keep item[/bright_black]\n· [red]d[/red] — [bright_black]delete item[/bright_black]\n· [yellow]e[/yellow] — [bright_black]edit item[/bright_black]"
                             )
                         print(f"\n{i:>3}. [green]{other}[/green]")
                         try:
@@ -245,7 +245,7 @@ class PW(object):
 
                     # add new other
                     print("Enter additional infos:")
-                    print("[black](leave blank to stop)[/black]")
+                    print("[bright_black](leave blank to stop)[/bright_black]")
                     while True:
                         try:
                             info: str = input("  · ")
@@ -425,7 +425,7 @@ def copy_pw_from_json(site_query: str) -> None:
     try:
         pyperclip.copy(pw)
         print("\nPassword copied to the clipboard")
-        print("[black]It will be cleared in 15 seconds or with Ctrl+c (^C)[/black]")
+        print("[bright_black]It will be cleared in 15 seconds or with Ctrl+C (^C)[/bright_black]")
         time.sleep(15)
 
     # exit with KeyboardInterrupt
