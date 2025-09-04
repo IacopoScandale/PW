@@ -1,0 +1,5 @@
+!.stignore
+!.stfolder
+!src/pw/data/pw_objects.json
+!src/pw/data/usage_counter.json
+*

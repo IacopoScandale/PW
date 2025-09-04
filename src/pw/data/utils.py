@@ -4,7 +4,7 @@ import sys
 from base64 import urlsafe_b64encode
 from datetime import datetime
 from getpass import getpass
-from typing import NoReturn
+from typing import Callable, NoReturn
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -179,10 +179,11 @@ def get_edit_date() -> str:
     return date
 
 
-def ask_for_pw_two_times(label: str = "Create PW password: ") -> str:
+def ask_for_pw_two_times(label: str = "Create PW password: ", hide_password: bool = True) -> str:
+    input_fn: Callable[[str], str] = getpass if hide_password else input
     try:
-        pw: str = getpass(label)
-        pw_check: str = getpass("Confirm password: ")
+        pw: str = input_fn(label)
+        pw_check: str = input_fn("Confirm password: ")
     except KeyboardInterrupt:
         sys.exit()
 

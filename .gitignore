@@ -1,9 +1,15 @@
+# python
 __pycache__/
-.vscode
 pw.egg-info
-pw_objects.json
-check_pw.txt
-usage_counter.json
-pw.csv
-change_pw_comm.py
+.venv
+
+# project
 TODO.md
+pw.csv
+check_pw.txt
+pw_objects.json
+usage_counter.json
+change_pw_comm.py
+
+# syncthing
+.stfolder

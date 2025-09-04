@@ -215,7 +215,7 @@ class PW(object):
                     dic["email"] = new_email
                 if change_pw:
                     print("\n[underline]Change Site Password[/underline]")
-                    new_pw: str = ask_for_pw_two_times("New password: ")
+                    new_pw: str = ask_for_pw_two_times("New password: ", hide_password=False)
                     new_encrypted_pw = encrypt_str(new_pw)
                     self.encrypted_pw = new_encrypted_pw
                     dic["encrypted_pw"] = new_encrypted_pw
