@@ -13,3 +13,4 @@ change_pw_comm.py
 
 # syncthing
 .stfolder
+.stversions
