@@ -1,4 +1,4 @@
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, ArgumentTypeError, Namespace
 
 from .__main__ import init_setup, show_infos
 from .add_comm import add_comm
@@ -26,6 +26,16 @@ from .edit_comm import edit_comm
 from .info_comm import info_comm
 from .list_comm import list_comm
 from .remove_comm import remove_comm
+
+
+def type_positive_int(num: str) -> int:
+    try:
+        num = int(num)
+    except ValueError:
+        raise ArgumentTypeError("Value must be a positive integer > 0")
+    if not (num > 0):
+        raise ArgumentTypeError(f"Value '{num}' must be a positive integer > 0")
+    return num
 
 
 def is_pw_set_up() -> bool:
@@ -77,6 +87,15 @@ def parse_arguments() -> Namespace:
     copy_parser.add_argument(
         "site_query",
         help="substring of the site we are looking for e.g. 'hub' for 'github.com'",
+    )
+    copy_parser.add_argument(
+        "-k","--keep",
+        type=type_positive_int,
+        default=15,
+        help=(
+            "Time in seconds (default=15) that the password remains in the "
+            + "clipboard before it is cleared"
+        )
     )
 
     # list subcommand
@@ -170,7 +189,7 @@ def main() -> None:
     elif args.command == PW_ALL_INFO_COMM_NAME:
         all_info_comm(args.site_query)
     elif args.command == PW_COPY_COMM_NAME:
-        copy_comm(args.site_query)
+        copy_comm(args.site_query, args.keep)
     elif args.command == PW_LIST_COMM_NAME:
         list_comm(args.site_query, args.raw)
     elif args.command == PW_EDIT_COMM_NAME:

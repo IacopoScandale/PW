@@ -2,9 +2,9 @@ from pathlib import Path
 
 
 # strings
-PACKAGE_NAME: str = "pw"
-DESCRIPTION: str = "CLI Password Manager."
-AUTHOR: str = "Iacopo Scandale"
+PACKAGE_NAME = "pw"
+DESCRIPTION = "CLI Password Manager."
+AUTHOR = "Iacopo Scandale"
 
 
 # commands

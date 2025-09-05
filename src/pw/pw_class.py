@@ -414,19 +414,18 @@ def get_pw_from_json(site_query: str) -> str:
     return obj.get_pw()
 
 
-def copy_pw_from_json(site_query: str) -> None:
+def copy_pw_from_json(site_query: str, keep: int = 15) -> None:
     """
-    copies pw in the clipboard
+    copies pw in the clipboard for `keep` seconds
     """
 
     pw = get_pw_from_json(site_query)
 
-    # copy pw to the clipboard for 30 seconds
     try:
         pyperclip.copy(pw)
         print("\nPassword copied to the clipboard")
-        print("[bright_black]It will be cleared in 15 seconds or with Ctrl+C (^C)[/bright_black]")
-        time.sleep(15)
+        print(f"[bright_black]It will be cleared in {keep} seconds or with Ctrl+C (^C)[/bright_black]")
+        time.sleep(keep)
 
     # exit with KeyboardInterrupt
     except KeyboardInterrupt:
