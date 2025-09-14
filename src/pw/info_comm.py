@@ -7,8 +7,8 @@ from .data.utils import add_one_to_counter
 from .pw_class import print_site_info_command
 
 
-def info_comm(site_query: str) -> None:
-    print_site_info_command(site_query, False)
+def info_comm(site_query: str, all_infos: bool = False) -> None:
+    print_site_info_command(site_query, all_infos)
 
     # +1 to usage counter
     add_one_to_counter(PW_INFO_COMM_NAME)

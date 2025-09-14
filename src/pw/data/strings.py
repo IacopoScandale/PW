@@ -12,7 +12,6 @@ COMMANDS: list[str] = [
     PW_COMM := "pw",
     PW_ADD_COMM_NAME := "add",
     PW_INFO_COMM_NAME := "info",
-    PW_ALL_INFO_COMM_NAME := "all_info",
     PW_COPY_COMM_NAME := "copy",
     PW_LIST_COMM_NAME := "list",
     PW_EDIT_COMM_NAME := "edit",
@@ -22,10 +21,7 @@ COMMANDS: list[str] = [
 
 # command help messages
 PW_ADD_HELP = "Add a site account to the database."
-PW_INFO_HELP = "Show some infos linked to chosen site found from site query"
-PW_ALL_INFO_HELP = (
-    "Prints all infos linked to chosen site found from site query requires PW password"
-)
+PW_INFO_HELP = "Show infos linked to chosen site found from site query"
 PW_COPY_HELP = "Copy the password associated with the selected account to the clipboard"
 PW_LIST_HELP = (
     "List all sites in the database. Also a query can be passed to filter the list"

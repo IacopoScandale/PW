@@ -2,15 +2,12 @@ from argparse import ArgumentParser, ArgumentTypeError, Namespace
 
 from .__main__ import init_setup, show_infos
 from .add_comm import add_comm
-from .all_info_comm import all_info_comm
 from .copy_comm import copy_comm
 from .data.strings import (
     DESCRIPTION,
     FILE_CHECK_PW,
     PW_ADD_COMM_NAME,
     PW_ADD_HELP,
-    PW_ALL_INFO_COMM_NAME,
-    PW_ALL_INFO_HELP,
     PW_COPY_COMM_NAME,
     PW_COPY_HELP,
     PW_EDIT_COMM_NAME,
@@ -68,15 +65,10 @@ def parse_arguments() -> Namespace:
         "site_query",
         help="substring of the site we are looking for e.g. 'hub' for 'github.com'",
     )
-
-    # all_info subcommand
-    all_info_parser = subparsers.add_parser(
-        PW_ALL_INFO_COMM_NAME,
-        help=PW_ALL_INFO_HELP,
-    )
-    all_info_parser.add_argument(
-        "site_query",
-        help="substring of the site we are looking for e.g. 'hub' for 'github.com'",
+    info_parser.add_argument(
+        "-a", "--all",
+        action="store_true",
+        help="Show all site infos (requires main PW password)"
     )
 
     # copy subcommand
@@ -185,9 +177,7 @@ def main() -> None:
     elif args.command == PW_ADD_COMM_NAME:
         add_comm()
     elif args.command == PW_INFO_COMM_NAME:
-        info_comm(args.site_query)
-    elif args.command == PW_ALL_INFO_COMM_NAME:
-        all_info_comm(args.site_query)
+        info_comm(args.site_query, args.all)
     elif args.command == PW_COPY_COMM_NAME:
         copy_comm(args.site_query, args.keep)
     elif args.command == PW_LIST_COMM_NAME:
